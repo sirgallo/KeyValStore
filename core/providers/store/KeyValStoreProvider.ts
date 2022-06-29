@@ -39,6 +39,12 @@ export class KeyValStoreProvider {
     await wrapAsync(deleteHelper, key);
   }
 
+  async current(): Promise<KeyValStore> {
+    const curHelper = () => this.store;
+    
+    return await wrapAsync(curHelper, null) as KeyValStore;
+  }
+
   async flush() {
     const flushHelper = () => this.store = {};
 

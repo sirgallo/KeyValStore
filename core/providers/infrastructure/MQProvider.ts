@@ -3,15 +3,15 @@ import { randomUUID } from 'crypto';
 
 import { cryptoOptions } from '@core/crypto/CryptoOptions';
 import { LogProvider } from '@core/providers/LogProvider';
-import { SimpleQueueProvider } from '@core/providers/SimpleQueueProvider';
+import { SimpleQueueProvider } from '@core/providers/queue/SimpleQueueProvider';
 import {
   IHeartBeat,
   IInternalJobQueueMessage,
   IInternalLivelinessResponse,
   LifeCycle,
   MachineStatus
-} from '@core/models/IMq';
-import { IGenericJob } from '@core/models/IJob';
+} from '@core/models/infrastructure/IMq';
+import { IGenericJob } from '@core/models/infrastructure/IJob';
 
 const NAME = 'MQ Provider';
 const strEncoding = 'utf-8';

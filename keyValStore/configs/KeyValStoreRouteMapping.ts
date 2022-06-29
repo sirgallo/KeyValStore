@@ -62,6 +62,25 @@ export const keyValStoreRouteMapping: Record<string, IBaseRoute>= {
           }
         ]
       },
+      current: {
+        name: '/current',
+        customConsoleMessages: [
+          {
+            1: { 
+              text: '/current', 
+              color: ROUTE 
+            },
+            2: { 
+              text: '200', 
+              color: STATUSOK 
+            },
+            3: { 
+              text: 'current store retrieved', 
+              color: INFO 
+            }
+          }
+        ]
+      },
       flush: {
         name: '/flush',
         customConsoleMessages: [

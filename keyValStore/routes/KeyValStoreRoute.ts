@@ -9,8 +9,7 @@ import {
   KeyValStoreGetRequest,
   KeyValStoreSetRequest
 } from '@keyValStore/models/KeyValStoreRequest';
-import { KeyValStoreEntry } from '@core/models/store/KeyValStore';
-import { createImportSpecifier } from 'typescript';
+import { KeyValStore, KeyValStoreEntry } from '@core/models/store/KeyValStore';
 
 const NAME = 'Key Value Store Route';
 
@@ -25,6 +24,7 @@ export class KeyValStoreRoute extends BaseRoute {
     this.router.post(keyValStoreRouteMapping.store.subRouteMapping.get.name, this.get.bind(this));
     this.router.post(keyValStoreRouteMapping.store.subRouteMapping.set.name, this.set.bind(this));
     this.router.post(keyValStoreRouteMapping.store.subRouteMapping.delete.name, this.delete.bind(this));
+    this.router.post(keyValStoreRouteMapping.store.subRouteMapping.current.name, this.current.bind(this));
     this.router.post(keyValStoreRouteMapping.store.subRouteMapping.flush.name, this.flush.bind(this));
   }
 
@@ -44,7 +44,7 @@ export class KeyValStoreRoute extends BaseRoute {
     } catch (err) {
       res
         .status(404)
-        .send({ err: err.toString(), message: 'Error in Login Route' })
+        .send({ err: err.toString(), message: 'Error in Get Route' })
     }
   }
 
@@ -67,7 +67,7 @@ export class KeyValStoreRoute extends BaseRoute {
     } catch (err) {
       res
         .status(404)
-        .send({ err: err.toString(), message: 'Error in Login Route' })
+        .send({ err: err.toString(), message: 'Error in Set Route' })
     }
   }
 
@@ -78,14 +78,31 @@ export class KeyValStoreRoute extends BaseRoute {
       this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.delete.customConsoleMessages[0], true);
 
       this.keyValStoreProv.printStore();
-      
+
       res
         .status(200)
         .send({ status: 'Delete Success', resp: `key-value with key ${deleteReq.findKey} deleted.` })
     } catch (err) {
       res
         .status(404)
-        .send({ err: err.toString(), message: 'Error in Login Route' })
+        .send({ err: err.toString(), message: 'Error in Delete Route' })
+    }
+  }
+
+  async current(req: Request, res: Response, next: NextFunction) {
+    try {
+      const resp: KeyValStore = await this.keyValStoreProv.current();
+      this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.delete.customConsoleMessages[0], true);
+
+      console.log(JSON.stringify(resp, null, 2));
+
+      res
+        .status(200)
+        .send({ status: 'Current Success', resp })
+    } catch (err) {
+      res
+        .status(404)
+        .send({ err: err.toString(), message: 'Error Fetching Current Store' })
     }
   }
 
@@ -102,7 +119,7 @@ export class KeyValStoreRoute extends BaseRoute {
     } catch (err) {
       res
         .status(404)
-        .send({ err: err.toString(), message: 'Error in Login Route' })
+        .send({ err: err.toString(), message: 'Error in Flush Route' })
     }
   }
 }

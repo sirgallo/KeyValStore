@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 import { randomBytes } from 'crypto';
 
 import { LogProvider } from '@core/providers/LogProvider';
-import { ILinkedNode, HashString } from '@core/models/IMq';
+import { ILinkedNode, HashString } from '@core/models/infrastructure/IMq';
 
 const NAME = 'Simple Queue Provider';
 const HASHLENGTH = 64;

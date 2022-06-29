@@ -5,7 +5,7 @@ import { writeFile, existsSync, readFile, mkdir, appendFile } from 'fs';
 import { randomUUID } from 'crypto';
 
 import { LogProvider } from '@core/providers/LogProvider';
-import { IFileOpOpts } from '@core/models/IFileOp';
+import { IFileOpOpts } from '@core/models/filesystem/IFileOp';
 
 export const asyncWriteFile = promisify(writeFile);
 export const asyncReadFile = promisify(readFile);

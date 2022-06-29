@@ -1,6 +1,6 @@
 const path = require('path');
 
-import { IFileOpOpts } from '@core/models/IFileOp';
+import { IFileOpOpts } from '@core/models/filesystem/IFileOp';
 import {
   CustomMessageWrap,
   Message,

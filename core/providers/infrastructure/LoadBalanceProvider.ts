@@ -3,15 +3,15 @@ import { randomUUID } from 'crypto';
 
 import { cryptoOptions } from '@core/crypto/CryptoOptions';
 import { LogProvider } from '@core/providers/LogProvider';
-import { SimpleQueueProvider } from '@core/providers/SimpleQueueProvider';
+import { SimpleQueueProvider } from '@core/providers/queue/SimpleQueueProvider';
 import {
   IAvailableMachine,
   IInternalJobQueueMessage,
   IInternalLivelinessResponse,
   ISockRequest,
   MachineTypes,
-} from '@core/models/IMq';
-import { MQProvider } from '@core/providers/MQProvider';
+} from '@core/models/infrastructure/IMq';
+import { MQProvider } from '@core/providers/infrastructure/MQProvider';
 import { sleep, toMs } from '@core/utils/Utils';
 
 const NAME = 'Load Balance Provider';
