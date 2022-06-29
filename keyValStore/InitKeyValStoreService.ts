@@ -1,9 +1,12 @@
 import { BaseServer } from '@baseServer/core/BaseServer';
 import { LogProvider } from '@core/providers/LogProvider';
+import { EventDrivenLog } from '@core/providers/queue/EventDrivenLog';
 
 import { KeyValStoreRoute } from '@keyValStore/routes/KeyValStoreRoute';
 import { keyValStoreRouteMapping } from '@keyValStore/configs/KeyValStoreRouteMapping';
 import { KeyValStoreProvider } from '@core/providers/store/KeyValStoreProvider';
+import { EventDrivenLogRoute } from './routes/EventDrivenLogRoute';
+import { eventDrivenLogRouteMapping } from './configs/EventDrivenLogRouteMapping';
 
 export class InitKeyValStoreService extends BaseServer {
   private keyValInitLog: LogProvider = new LogProvider(`${this.name} Init`);
@@ -18,8 +21,16 @@ export class InitKeyValStoreService extends BaseServer {
 
   async startServer() {
     try {
-      const keyValRoute = new KeyValStoreRoute(keyValStoreRouteMapping.store.name, this.keyValStoreProv);
-      this.setRoutes([ keyValRoute ]);
+      const eventLog: EventDrivenLog = new EventDrivenLog();
+      eventLog.start();
+
+      const keyValRoute = new KeyValStoreRoute(keyValStoreRouteMapping.store.name, this.keyValStoreProv, eventLog);
+      const eventLogRoute = new EventDrivenLogRoute(eventDrivenLogRouteMapping.store.name, eventLog);
+
+      this.setRoutes([ 
+        keyValRoute,
+        eventLogRoute
+      ]);
 
       this.run();
     } catch (err) {

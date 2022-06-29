@@ -79,9 +79,17 @@ export class SimpleQueueProvider {
 
   peek() {
     try {
-      if (! this.headNode) return null;
-      else return this.headNode.value;
+      return this.headNode?.value || null;
     } catch (err) {
+      this.queueLog.error('Unable to peek first element in queue.');
+      throw err;
+    }
+  }
+
+  all() {
+    try {
+      return this.elements || null;
+    } catch(err) {
       this.queueLog.error('Unable to peek first element in queue.');
       throw err;
     }

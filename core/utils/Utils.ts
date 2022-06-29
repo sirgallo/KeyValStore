@@ -1,5 +1,7 @@
 import { freemem } from 'os';
 
+import { SimpleQueueProvider } from '@core/providers/queue/SimpleQueueProvider';
+
 export const toMs = {
   sec: (sec: number): number => sec * 1000,
   min: (min: number): number => min * 60000
@@ -19,5 +21,7 @@ export const wrapAsync = async (func: Function, ...params) => {
     }
   });
 }
+
+export const setIntervalQueue = (queue: SimpleQueueProvider, timeout: number = 200) => setInterval(() => queue.emitEvent(), timeout);
 
 export const extractErrorMessage = (err: Error): string => err.message;

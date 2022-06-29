@@ -12,7 +12,7 @@ import {
   MachineTypes,
 } from '@core/models/infrastructure/IMq';
 import { MQProvider } from '@core/providers/infrastructure/MQProvider';
-import { sleep, toMs } from '@core/utils/Utils';
+import { sleep, toMs, setIntervalQueue } from '@core/utils/Utils';
 
 const NAME = 'Load Balance Provider';
 
@@ -82,8 +82,8 @@ export class LoadBalanceProvider {
       this.jobQueueOn();
       this.retQueueOn();
      
-      MQProvider.setIntervalQueue(this.jobQueue);
-      MQProvider.setIntervalQueue(this.retQueue);
+      setIntervalQueue(this.jobQueue);
+      setIntervalQueue(this.retQueue);
 
       this.startClientRouter();
       this.startWorkerRouter();

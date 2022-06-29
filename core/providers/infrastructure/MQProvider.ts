@@ -12,6 +12,7 @@ import {
   MachineStatus
 } from '@core/models/infrastructure/IMq';
 import { IGenericJob } from '@core/models/infrastructure/IJob';
+import { setIntervalQueue } from '@core/utils/Utils';
 
 const NAME = 'MQ Provider';
 const strEncoding = 'utf-8';
@@ -84,8 +85,8 @@ export class MQProvider {
       this.reqQueue = new SimpleQueueProvider(reqQueueEventName);
       this.reqQueueOn();
       //  check for stale jobs in queue on interval, in case no new jobs come in on sock
-      MQProvider.setIntervalQueue(this.workerQueue);
-      MQProvider.setIntervalQueue(this.reqQueue);
+      setIntervalQueue(this.workerQueue);
+      setIntervalQueue(this.reqQueue);
 
       const healthCheck: IHeartBeat = { 
         routerId: this.sock.routingId, 
@@ -126,7 +127,7 @@ export class MQProvider {
       this.reqQueue = new SimpleQueueProvider(reqQueueEventName);
       this.reqQueueOn();
       
-      MQProvider.setIntervalQueue(this.reqQueue);
+      setIntervalQueue(this.reqQueue);
 
       const healthCheck: IHeartBeat = { 
         routerId: this.sock.routingId, 
@@ -218,9 +219,5 @@ export class MQProvider {
       status,
       ...(lifeCycle ? { lifeCycle } : {})
     }
-  }
-
-  static setIntervalQueue(queue: SimpleQueueProvider, timeout: number = 200) {
-    setInterval(() => queue.emitEvent(), timeout);
   }
 }
