@@ -14,9 +14,8 @@ export class KeyValStoreProvider {
 
   constructor() {}
 
-  async get(topic: string, key: string): Promise<KeyValStoreEntry> {
-    const getHelper = (topic: string, key: string) => this.store[topic][key];
-    return wrapAsync(getHelper, topic, key) as KeyValStoreEntry;
+  async get(topic: string, keys: string[]): Promise<KeyValStoreEntry[]> {
+    return wrapAsync(this.multiValReducer.bind(this), topic, keys) as Promise<KeyValStoreEntry[]>;
   }
 
   async set(opts: KeyValStoreEntryOpts): Promise<KeyValStore> {
@@ -28,14 +27,8 @@ export class KeyValStoreProvider {
     return wrapAsync(setHelper, opts) as Promise<KeyValStore>;
   }
 
-  async delete(topic: string, key: string): Promise<KeyValStoreEntry> {
-    const deleteHelper = (topic: string, key: string) => { 
-      const deletedElem = this.store[topic][key];
-      delete this.store[topic][key];
-      return deletedElem;
-    }
-
-    return wrapAsync(deleteHelper, topic, key) as Promise<KeyValStoreEntry>;
+  async delete(topic: string, keys: string[]): Promise<KeyValStoreEntry[]> {
+    return wrapAsync(this.multiValReducer.bind(this), topic, keys, true) as Promise<KeyValStoreEntry[]>;
   }
 
   async current(topic?: string): Promise<KeyValStore> {
@@ -51,5 +44,16 @@ export class KeyValStoreProvider {
     await wrapAsync(flushHelper, topic);
 
     return true;
+  }
+
+  private multiValReducer(topic: string, keys: string[], del?: boolean): KeyValStoreEntry[] {
+    return keys.reduce( (acc: KeyValStoreEntry[], key) => { 
+      if (this.store[topic][key]) {
+        const val = this.store[topic][key];
+        if (del) delete this.store[topic][key]
+        return acc.concat({ [key]: val })
+      };
+      return acc;
+    }, []);
   }
 }

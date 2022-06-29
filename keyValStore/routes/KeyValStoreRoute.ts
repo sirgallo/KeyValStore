@@ -50,7 +50,7 @@ export class KeyValStoreRoute extends BaseRoute {
     await this.pipeRequest(
       { method: keyValStoreRouteMapping.store.subRouteMapping.delete.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.delete }, 
       req, res, next, 
-      deleteReq.topic, deleteReq.findKey
+      deleteReq.topic, deleteReq.findKey, deleteReq?.del
     );
   }
 

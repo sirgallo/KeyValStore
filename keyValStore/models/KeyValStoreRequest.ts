@@ -5,7 +5,8 @@ export interface KeyValStoreTopicRequest {
 }
 
 export interface KeyValStoreGetRequest extends KeyValStoreTopicRequest {
-  findKey: string;
+  findKey: string[];
+  del?: boolean;
 }
 
 export interface KeyValStoreSetRequest {
