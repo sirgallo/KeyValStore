@@ -14,7 +14,6 @@ import { KeyValStore, KeyValStoreEntry } from '@core/models/store/KeyValStore';
 const NAME = 'Key Value Store Route';
 
 export class KeyValStoreRoute extends BaseRoute {
-  name = NAME;
   private log: LogProvider = new LogProvider(NAME);
 
   constructor(rootpath: string, private keyValStoreProv: KeyValStoreProvider) {
@@ -31,34 +30,25 @@ export class KeyValStoreRoute extends BaseRoute {
   async get(req: Request, res: Response, next: NextFunction) {
     const getReq: KeyValStoreGetRequest = req.body;
 
-    console.log('get request', getReq);
-    this.keyValStoreProv.printStore();
-
     try {
       const resp: KeyValStoreEntry = await this.keyValStoreProv.get(getReq.findKey);
       this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.get.customConsoleMessages[0], true);
 
       res
         .status(200)
-        .send({ status: 'Get Success', resp })
+        .send({ status: 'Get Success', resp });
     } catch (err) {
       res
         .status(404)
-        .send({ err: err.toString(), message: 'Error in Get Route' })
+        .send({ err: err.toString(), message: 'Error in Get Route' });
     }
   }
 
   async set(req: Request, res: Response, next: NextFunction) {
     const setReq: KeyValStoreSetRequest = req.body;
 
-    console.log('set request', setReq);
-
     try {
       const resp: KeyValStoreEntry = await this.keyValStoreProv.set(setReq.setOpts);
-
-      console.log('set resp', resp);
-      this.keyValStoreProv.printStore();
-
       this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.set.customConsoleMessages[0], true);
 
       res
@@ -67,25 +57,24 @@ export class KeyValStoreRoute extends BaseRoute {
     } catch (err) {
       res
         .status(404)
-        .send({ err: err.toString(), message: 'Error in Set Route' })
+        .send({ err: err.toString(), message: 'Error in Set Route' });
     }
   }
 
   async delete(req: Request, res: Response, next: NextFunction) {
-    const deleteReq: KeyValStoreGetRequest = req.body
+    const deleteReq: KeyValStoreGetRequest = req.body;
+
     try {
       await this.keyValStoreProv.delete(deleteReq.findKey);
       this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.delete.customConsoleMessages[0], true);
 
-      this.keyValStoreProv.printStore();
-
       res
         .status(200)
-        .send({ status: 'Delete Success', resp: `key-value with key ${deleteReq.findKey} deleted.` })
+        .send({ status: 'Delete Success', resp: `key-value with key ${deleteReq.findKey} deleted.` });
     } catch (err) {
       res
         .status(404)
-        .send({ err: err.toString(), message: 'Error in Delete Route' })
+        .send({ err: err.toString(), message: 'Error in Delete Route' });
     }
   }
 
@@ -94,15 +83,13 @@ export class KeyValStoreRoute extends BaseRoute {
       const resp: KeyValStore = await this.keyValStoreProv.current();
       this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.delete.customConsoleMessages[0], true);
 
-      console.log(JSON.stringify(resp, null, 2));
-
       res
         .status(200)
-        .send({ status: 'Current Success', resp })
+        .send({ status: 'Current Success', resp });
     } catch (err) {
       res
         .status(404)
-        .send({ err: err.toString(), message: 'Error Fetching Current Store' })
+        .send({ err: err.toString(), message: 'Error Fetching Current Store' });
     }
   }
 
@@ -110,8 +97,6 @@ export class KeyValStoreRoute extends BaseRoute {
     try {
       await this.keyValStoreProv.flush()
       this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.flush.customConsoleMessages[0], true);
-
-      this.keyValStoreProv.printStore();
 
       res
         .status(200)
