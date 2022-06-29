@@ -15,9 +15,7 @@ export class InitKeyValStoreService extends BaseServer {
   async startServer() {
     try {
       const keyValRoute = new KeyValStoreRoute(keyValStoreRouteMapping.store.name, this.keyValStoreProv);
-      this.setRoutes([ 
-        keyValRoute 
-      ]);
+      this.setRoutes([ keyValRoute ]);
 
       this.run();
     } catch (err) {
