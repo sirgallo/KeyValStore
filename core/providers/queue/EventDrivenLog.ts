@@ -6,19 +6,23 @@ const EVENT_NAME = 'Event Log';
 interface EventDrivenLogEntry {
   provider: string;
   method: string;
-  event: string;
+  event?: string;
 }
 
 export class EventDrivenLog {
   private eventQueue: SimpleQueueProvider;
 
   constructor() {}
-  
+
   async start() {
     this.eventQueue = new SimpleQueueProvider(EVENT_NAME);
     this.eventQueueOn();
 
     setIntervalQueue(this.eventQueue);
+  }
+
+  countLogs() {
+    return this.eventQueue.length;
   }
 
   addLog(entry: EventDrivenLogEntry): boolean {

@@ -81,13 +81,13 @@ export class KeyValStoreRoute extends BaseRoute {
   async performRouteAction(opts: RouteOpts, req: Request, res: Response, next: NextFunction, ...params) {
     try {
       const resp = await this.keyValStoreProv[opts.method](...params);
+      this.log.custom(opts.customMsg.customConsoleMessages[0], true);
+      
       this.eventLog.addLog({
         provider: 'Key Value Store Provider',
         method: opts.method,
         event: JSON.stringify(resp) || null
       });
-
-      this.log.custom(opts.customMsg.customConsoleMessages[0], true);
 
       res
         .status(200)

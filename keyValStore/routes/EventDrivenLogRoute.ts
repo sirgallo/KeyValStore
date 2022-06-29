@@ -19,6 +19,14 @@ export class EventDrivenLogRoute extends BaseRoute {
 
     this.router.post(eventDrivenLogRouteMapping.store.subRouteMapping.getAllLogs.name, this.getAllLogs.bind(this));
     this.router.post(eventDrivenLogRouteMapping.store.subRouteMapping.getLatestLog.name, this.getLatestLog.bind(this));
+    this.router.post(eventDrivenLogRouteMapping.store.subRouteMapping.countLogs.name, this.countLogs.bind(this));
+  }
+
+  private async countLogs(req: Request, res: Response, next: NextFunction) {
+    await this.pipeRequest(
+      { method: eventDrivenLogRouteMapping.store.subRouteMapping.countLogs.key, customMsg: eventDrivenLogRouteMapping.store.subRouteMapping.countLogs }, 
+      req, res, next
+    );
   }
 
   private async getAllLogs(req: Request, res: Response, next: NextFunction) {
@@ -44,6 +52,11 @@ export class EventDrivenLogRoute extends BaseRoute {
       const resp = await this.eventLog[opts.method](...params);
       this.log.custom(opts.customMsg.customConsoleMessages[0], true);
 
+      this.eventLog.addLog({
+        provider: 'Event Driven Log Provider',
+        method: opts.method
+      });
+      
       res
         .status(200)
         .send({ status: 'success', resp })

@@ -6,6 +6,26 @@ export const eventDrivenLogRouteMapping: Record<string, IBaseRoute>= {
     key: 'store',
     name: '/store',
     subRouteMapping: {
+      countLogs: {
+        key: 'countLogs',
+        name: '/countlogs',
+        customConsoleMessages: [
+          {
+            1: { 
+              text: '/countlogs', 
+              color: ROUTE 
+            },
+            2: { 
+              text: '200', 
+              color: STATUSOK 
+            },
+            3: { 
+              text: 'log count retrieved', 
+              color: INFO 
+            }
+          }
+        ]
+      },
       getAllLogs: {
         key: 'getAllLogs',
         name: '/getalllogs',
