@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { BaseRoute } from '@core/baseServer/core/BaseRoute';
+import { BaseRoute, RouteOpts } from '@core/baseServer/core/BaseRoute';
 import { LogProvider } from '@core/providers/LogProvider';
 import { KeyValStoreProvider } from '@core/providers/store/KeyValStoreProvider';
 
@@ -10,7 +10,6 @@ import {
   KeyValStoreSetRequest,
   KeyValStoreTopicRequest
 } from '@keyValStore/models/KeyValStoreRequest';
-import { KeyValStore, KeyValStoreEntry } from '@core/models/store/KeyValStore';
 
 const NAME = 'Key Value Store Route';
 
@@ -30,86 +29,45 @@ export class KeyValStoreRoute extends BaseRoute {
 
   async get(req: Request, res: Response, next: NextFunction) {
     const getReq: KeyValStoreGetRequest = req.body;
-
-    try {
-      const resp: KeyValStoreEntry = await this.keyValStoreProv.get(getReq.topic, getReq.findKey);
-      this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.get.customConsoleMessages[0], true);
-
-      res
-        .status(200)
-        .send({ status: 'Get Success', resp });
-    } catch (err) {
-      res
-        .status(404)
-        .send({ err: err.toString(), message: 'Error in Get Route' });
-    }
+    await this.performRouteAction({ method: 'get', customMsg: keyValStoreRouteMapping.store.subRouteMapping.get }, req, res, next, getReq.topic, getReq.findKey);
   }
 
   async set(req: Request, res: Response, next: NextFunction) {
     const setReq: KeyValStoreSetRequest = req.body;
-
-    try {
-      const resp: KeyValStoreEntry = await this.keyValStoreProv.set(setReq.setOpts);
-      this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.set.customConsoleMessages[0], true);
-
-      res
-        .status(200)
-        .send({ status: 'Set Success', resp })
-    } catch (err) {
-      res
-        .status(404)
-        .send({ err: err.toString(), message: 'Error in Set Route' });
-    }
+    await this.performRouteAction({ method: 'set', customMsg: keyValStoreRouteMapping.store.subRouteMapping.set }, req, res, next, setReq.setOpts);
   }
 
   async delete(req: Request, res: Response, next: NextFunction) {
     const deleteReq: KeyValStoreGetRequest = req.body;
-
-    try {
-      await this.keyValStoreProv.delete(deleteReq.topic, deleteReq.findKey);
-      this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.delete.customConsoleMessages[0], true);
-
-      res
-        .status(200)
-        .send({ status: 'Delete Success', resp: `key-value with key ${deleteReq.findKey} deleted.` });
-    } catch (err) {
-      res
-        .status(404)
-        .send({ err: err.toString(), message: 'Error in Delete Route' });
-    }
+    await this.performRouteAction({ method: 'delete', customMsg: keyValStoreRouteMapping.store.subRouteMapping.delete }, req, res, next, deleteReq.topic, deleteReq.findKey);
   }
 
   async current(req: Request, res: Response, next: NextFunction) {
     const topicReq: KeyValStoreTopicRequest | null = req.body || null;
-
-    try {
-      const resp: KeyValStore = await this.keyValStoreProv.current(topicReq?.topic);
-      this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.current.customConsoleMessages[0], true);
-
-      res
-        .status(200)
-        .send({ status: 'Current Success', resp });
-    } catch (err) {
-      res
-        .status(404)
-        .send({ err: err.toString(), message: 'Error Fetching Current Store' });
-    }
+    await this.performRouteAction({ method: 'current', customMsg: keyValStoreRouteMapping.store.subRouteMapping.current }, req, res, next, topicReq?.topic);
   }
 
   async flush(req: Request, res: Response, next: NextFunction) {
     const topicReq: KeyValStoreTopicRequest | null = req.body || null;
+    await this.performRouteAction({ method: 'flush', customMsg: keyValStoreRouteMapping.store.subRouteMapping.flush }, req, res, next, topicReq?.topic);
+  }
 
+  async validateRoute(req: Request, res: Response, next: NextFunction): Promise<boolean> {
+    return true;
+  }
+
+  async performRouteAction(opts: RouteOpts, req: Request, res: Response, next: NextFunction, ...params) {
     try {
-      await this.keyValStoreProv.flush(topicReq?.topic);
-      this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.flush.customConsoleMessages[0], true);
+      const resp = await this.keyValStoreProv[opts.method](...params);
+      this.log.custom(opts.customMsg.customConsoleMessages[0], true);
 
       res
         .status(200)
-        .send({ status: 'Flush Success', resp: true })
+        .send({ status: 'success', resp })
     } catch (err) {
       res
         .status(404)
-        .send({ err: err.toString(), message: 'Error in Flush Route' })
+        .send({ err: err.toString() })
     }
   }
 }
