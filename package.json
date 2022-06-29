@@ -3,7 +3,8 @@
   "version": "0.0.1-dev",
   "scripts": {
     "build:all": "grunt --gruntfile gruntfile.js",
-    "start:keyval": "node ./dist/keyValStore/StartKeyValStoreService.js --color"
+    "start:keyval": "node ./dist/keyValStore/StartKeyValStoreService.js --color",
+    "start:repkvs": "node ./dist/repKVS/StartKVSService.js --color"
   },
   "author": "Sir Gallo",
   "license": "ISC",
@@ -46,6 +47,7 @@
   "_moduleAliases": {
     "@core": "./dist/core",
     "@baseServer": "./dist/core/baseServer",
-    "@keyValStore": "./dist/keyValStore"
+    "@keyValStore": "./dist/keyValStore",
+    "@repKVS": "./dist/repKVS"
   }
 }

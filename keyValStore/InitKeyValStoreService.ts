@@ -7,7 +7,10 @@ import { KeyValStoreProvider } from '@core/providers/store/KeyValStoreProvider';
 
 export class InitKeyValStoreService extends BaseServer {
   private keyValInitLog: LogProvider = new LogProvider(`${this.name} Init`);
-  private keyValStoreProv: KeyValStoreProvider = new KeyValStoreProvider();
+
+  constructor(name: string, port?: number, version?: string, numOfCpus?: number, private keyValStoreProv: KeyValStoreProvider = new KeyValStoreProvider()) {
+    super(name, port, version, numOfCpus);
+  }
 
   async startServer() {
     try {
