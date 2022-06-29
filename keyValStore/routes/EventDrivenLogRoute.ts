@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 
 import { BaseRoute, RouteOpts } from '@core/baseServer/core/BaseRoute';
 import { LogProvider } from '@core/providers/LogProvider';
-import { KeyValStoreProvider } from '@core/providers/store/KeyValStoreProvider';
 import { extractErrorMessage } from '@core/utils/Utils';
 
 import { eventDrivenLogRouteMapping } from '@keyValStore/configs/EventDrivenLogRouteMapping';
@@ -59,11 +58,11 @@ export class EventDrivenLogRoute extends BaseRoute {
       
       res
         .status(200)
-        .send({ status: 'success', resp })
+        .send({ status: 'success', resp });
     } catch (err) {
       res
         .status(404)
-        .send({ err: extractErrorMessage(err as Error) })
+        .send({ err: extractErrorMessage(err as Error) });
     }
   }
 }

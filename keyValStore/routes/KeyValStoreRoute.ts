@@ -82,7 +82,7 @@ export class KeyValStoreRoute extends BaseRoute {
     try {
       const resp = await this.keyValStoreProv[opts.method](...params);
       this.log.custom(opts.customMsg.customConsoleMessages[0], true);
-      
+
       this.eventLog.addLog({
         provider: 'Key Value Store Provider',
         method: opts.method,
@@ -91,11 +91,11 @@ export class KeyValStoreRoute extends BaseRoute {
 
       res
         .status(200)
-        .send({ status: 'success', resp })
+        .send({ status: 'success', resp });
     } catch (err) {
       res
         .status(404)
-        .send({ err: extractErrorMessage(err as Error) })
+        .send({ err: extractErrorMessage(err as Error) });
     }
   }
 }
