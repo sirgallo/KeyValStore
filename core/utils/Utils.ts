@@ -19,3 +19,5 @@ export const wrapAsync = async (func: Function, ...params) => {
     }
   });
 }
+
+export const extractErrorMessage = (err: Error): string => err.message;

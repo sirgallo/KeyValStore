@@ -47,8 +47,8 @@ export class KeyValStoreProvider {
   }
 
   private multiValReducer(topic: string, keys: string[], del?: boolean): KeyValStoreEntry[] {
-    return keys.reduce( (acc: KeyValStoreEntry[], key) => { 
-      if (this.store[topic][key]) {
+    return keys.reduce( (acc: KeyValStoreEntry[], key: string) => { 
+      if (this.store?.[topic]?.[key]) {
         const val = this.store[topic][key];
         if (del) delete this.store[topic][key];
         return acc.concat({ [key]: val });

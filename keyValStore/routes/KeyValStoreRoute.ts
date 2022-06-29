@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { BaseRoute, RouteOpts } from '@core/baseServer/core/BaseRoute';
 import { LogProvider } from '@core/providers/LogProvider';
 import { KeyValStoreProvider } from '@core/providers/store/KeyValStoreProvider';
+import { extractErrorMessage } from '@core/utils/Utils';
 
 import { keyValStoreRouteMapping } from '@keyValStore/configs/KeyValStoreRouteMapping';
 import { 
@@ -87,7 +88,7 @@ export class KeyValStoreRoute extends BaseRoute {
     } catch (err) {
       res
         .status(404)
-        .send({ err: err.toString() })
+        .send({ err: extractErrorMessage(err as Error) })
     }
   }
 }
