@@ -21,7 +21,7 @@
     "paths": {
       "@core/*": ["core/*"],
       "@baseServer/*": ["core/baseServer/*"],
-      "@keyValStore/*": ["keyValStore/*"],
+      "@keyValStore/*": ["keyValStore/*"]
     }
   }
 }
