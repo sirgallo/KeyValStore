@@ -1,6 +1,7 @@
 import { KeyValStoreEntry, KeyValStoreEntryOpts } from '@core/models/store/KeyValStore';
 
 export interface KeyValStoreGetRequest {
+  topic: string;
   findKey: string;
 }
 

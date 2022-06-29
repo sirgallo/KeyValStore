@@ -1,4 +1,21 @@
---> stub
+# Design
+
+
+##  Key-Value Store Design
+
+The key-value store is separated into `topics`, where each topic is a collection of objects in mem.
+
+```ts
+{
+  <topic>: {
+    <key>: {
+      <topic>: string,
+      <value>: any
+    }
+  }
+}
+```
+
 
 ##  Persist to Cold Storage
 

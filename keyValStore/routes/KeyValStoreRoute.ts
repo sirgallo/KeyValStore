@@ -31,7 +31,7 @@ export class KeyValStoreRoute extends BaseRoute {
     const getReq: KeyValStoreGetRequest = req.body;
 
     try {
-      const resp: KeyValStoreEntry = await this.keyValStoreProv.get(getReq.findKey);
+      const resp: KeyValStoreEntry = await this.keyValStoreProv.get(getReq.topic, getReq.findKey);
       this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.get.customConsoleMessages[0], true);
 
       res
@@ -65,7 +65,7 @@ export class KeyValStoreRoute extends BaseRoute {
     const deleteReq: KeyValStoreGetRequest = req.body;
 
     try {
-      await this.keyValStoreProv.delete(deleteReq.findKey);
+      await this.keyValStoreProv.delete(deleteReq.topic, deleteReq.findKey);
       this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.delete.customConsoleMessages[0], true);
 
       res
