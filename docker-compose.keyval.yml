@@ -1,0 +1,41 @@
+version: "3"
+services:
+  keyvalproxy: 
+    image: nginx:latest
+    container_name: nginx_keyval_cont
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports: 
+      - '6789:6789'
+    networks:
+      client-network:
+      keyval-network:
+    depends_on:
+      - keyval
+  keyval:
+    image: keyval-img
+    build:
+      context: .
+      dockerfile: ./keyValStore/Dockerfile
+    ports:
+      - '9876'
+    environment:
+      - NODE_ENV=docker
+      - NODE_OPTIONS="--max-old-space-size=4096"
+    volumes:
+      - keyval-data:/usr/src/keyval
+    networks:
+      keyval-network:
+    healthcheck:
+      test: curl --fail http://localhost:9876/poll || kill 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always
+networks:
+  client-network:
+    driver: bridge
+  keyval-network:
+    driver: bridge
+volumes:
+  keyval-data:

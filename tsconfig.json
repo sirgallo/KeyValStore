@@ -1,0 +1,27 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "outDir": "./dist",
+    "sourceMap": false,
+    "declaration": false,
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "target": "ES2021",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "ES2021",
+      "dom"
+    ],
+    "baseUrl": "./",
+    "paths": {
+      "@core/*": ["core/*"],
+      "@baseServer/*": ["core/baseServer/*"],
+      "@keyValStore/*": ["keyValStore/*"],
+    }
+  }
+}

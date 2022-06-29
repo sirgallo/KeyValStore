@@ -1,0 +1,4 @@
+## Libraries
+
+- bcrypt
+- jsonwebtoken

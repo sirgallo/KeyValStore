@@ -1,0 +1,3 @@
+//  for testing, manually input your own secret phrase in production
+export const jwtSecret = 'EF7799D9E6E028782B6EA5F9982D3BA463E3A2432E96F1BE7A2226B997A625AF';
+export const refreshSecret = 'JAHHANPMN4PI5WVLYMTX6R96RE1PD6TGZR0FMXZU3EOFA3EAZ7JLQMF9PFKJ7E85';
