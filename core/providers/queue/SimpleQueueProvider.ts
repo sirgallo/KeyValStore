@@ -79,7 +79,7 @@ export class SimpleQueueProvider {
 
   peek() {
     try {
-      return this.tailNode?.value || null;
+      return { value: this.tailNode?.value, timestamp: this.tailNode?.timestamp } || null;
     } catch (err) {
       this.queueLog.error('Unable to peek first element in queue.');
       throw err;
