@@ -9,12 +9,12 @@ interface EventDrivenLogEntry {
   event?: string;
 }
 
-export class EventDrivenLog {
+export class EventDrivenLogProvider {
   private eventQueue: SimpleQueueProvider;
 
   constructor() {}
 
-  async start() {
+  start() {
     this.eventQueue = new SimpleQueueProvider(EVENT_NAME);
     this.eventQueueOn();
 
@@ -39,7 +39,7 @@ export class EventDrivenLog {
     return this.eventQueue.all();
   }
 
-  async eventQueueOn() {
+  eventQueueOn() {
     this.eventQueue.queueUpdate.on(this.eventQueue.eventName, async () => {
       if (this.eventQueue.length > 0) { /* do nothing for now */ }
     });

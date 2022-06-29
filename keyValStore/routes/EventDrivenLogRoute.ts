@@ -5,14 +5,14 @@ import { LogProvider } from '@core/providers/LogProvider';
 import { extractErrorMessage } from '@core/utils/Utils';
 
 import { eventDrivenLogRouteMapping } from '@keyValStore/configs/EventDrivenLogRouteMapping';
-import { EventDrivenLog } from '@core/providers/queue/EventDrivenLog';
+import { EventDrivenLogProvider } from '@core/providers/queue/EventDrivenLogProvider';
 
 const NAME = 'Event Driven Log Route';
 
 export class EventDrivenLogRoute extends BaseRoute {
   private log: LogProvider = new LogProvider(NAME);
 
-  constructor(rootpath: string, private eventLog: EventDrivenLog) {
+  constructor(rootpath: string, private eventLog: EventDrivenLogProvider) {
     super(rootpath);
     this.log.initFileLogger();
 

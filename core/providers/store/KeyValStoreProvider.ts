@@ -1,4 +1,6 @@
-import { wrapAsync } from '@core/utils/Utils';
+import { cloneDeep, mergeWith, isArray } from 'lodash';
+
+import { mergeDeep, wrapAsync } from '@core/utils/Utils';
 import { 
   KeyValStore, 
   KeyValStoreEntry, 
@@ -20,7 +22,10 @@ export class KeyValStoreProvider {
 
   async set(opts: KeyValStoreEntryOpts): Promise<KeyValStore> {
     const setHelper = (opts: KeyValStoreEntryOpts) => {
-      this.store = { ...this.store, ...opts.entry };
+      this.store = mergeWith(this.store, opts.entry, (obj, src) => { 
+        if(isArray(obj)) return obj.concat(src) 
+      });
+
       return opts.entry || null;
     }
   

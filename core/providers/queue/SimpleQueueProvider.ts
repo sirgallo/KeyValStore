@@ -5,7 +5,7 @@ import { LogProvider } from '@core/providers/LogProvider';
 import { ILinkedNode, HashString } from '@core/models/infrastructure/IMq';
 
 const NAME = 'Simple Queue Provider';
-const HASHLENGTH = 64;
+const HASHLENGTH = 48;
 const HASHENCODING = 'hex';
 
 export class SimpleQueueProvider {
@@ -26,15 +26,17 @@ export class SimpleQueueProvider {
 
   enqueue(insertValue: any) {
     try {
-      const hashRef = randomBytes(HASHLENGTH)
-        .toString(HASHENCODING);
+      const timestamp = new Date();
+
+      const hashRef = `${randomBytes(HASHLENGTH)
+        .toString(HASHENCODING)}-${timestamp.toISOString()}`;
       
       if (! this.headNode) {
         this.headNode = this.tailNode = {
           id: hashRef,
           next: null,
           value: insertValue,
-          timestamp: new Date()
+          timestamp
         }
 
         this.elements[hashRef] = this.headNode;

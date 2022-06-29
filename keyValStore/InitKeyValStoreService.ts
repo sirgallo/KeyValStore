@@ -1,6 +1,6 @@
 import { BaseServer } from '@baseServer/core/BaseServer';
 import { LogProvider } from '@core/providers/LogProvider';
-import { EventDrivenLog } from '@core/providers/queue/EventDrivenLog';
+import { EventDrivenLogProvider } from '@core/providers/queue/EventDrivenLogProvider';
 
 import { KeyValStoreRoute } from '@keyValStore/routes/KeyValStoreRoute';
 import { keyValStoreRouteMapping } from '@keyValStore/configs/KeyValStoreRouteMapping';
@@ -21,7 +21,7 @@ export class InitKeyValStoreService extends BaseServer {
 
   async startServer() {
     try {
-      const eventLog: EventDrivenLog = new EventDrivenLog();
+      const eventLog: EventDrivenLogProvider = new EventDrivenLogProvider();
       eventLog.start();
 
       const keyValRoute = new KeyValStoreRoute(keyValStoreRouteMapping.store.name, this.keyValStoreProv, eventLog);

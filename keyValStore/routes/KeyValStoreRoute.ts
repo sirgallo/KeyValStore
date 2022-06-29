@@ -11,14 +11,18 @@ import {
   KeyValStoreSetRequest,
   KeyValStoreTopicRequest
 } from '@keyValStore/models/KeyValStoreRequest';
-import { EventDrivenLog } from '@core/providers/queue/EventDrivenLog';
+import { EventDrivenLogProvider } from '@core/providers/queue/EventDrivenLogProvider';
 
 const NAME = 'Key Value Store Route';
 
 export class KeyValStoreRoute extends BaseRoute {
   private log: LogProvider = new LogProvider(NAME);
 
-  constructor(rootpath: string, private keyValStoreProv: KeyValStoreProvider, private eventLog: EventDrivenLog) {
+  constructor(
+    rootpath: string, 
+    private keyValStoreProv: KeyValStoreProvider, 
+    private eventLog: EventDrivenLogProvider
+  ) {
     super(rootpath);
     this.log.initFileLogger();
 

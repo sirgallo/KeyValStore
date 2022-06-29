@@ -11,6 +11,27 @@ export const sleep = async (timeout: number) => new Promise(res => setTimeout(re
 
 export const isAtMaxMem = (usedMem: number): boolean => usedMem >= freemem();
 
+//  Javascript only does shallow merge on primitives, need to recursively merge to merge nested objects
+//  but just use lodash merge, it is better
+export const mergeDeep = (target: any, source: any, depth?: number) => {
+  if (depth < 0 || ! depth) {
+    Object.keys(source).forEach( key => {
+      const targetVal = target[key];
+      const sourceVal = source[key];
+
+      if (targetVal instanceof Array && sourceVal instanceof Array) {
+        target[key] =  targetVal.concat(sourceVal);
+      } else if (targetVal instanceof Object && sourceVal instanceof Object) {
+        target[key] = mergeDeep(Object.assign({}, targetVal), sourceVal, depth ? depth-- : null);
+      } else {
+        target[key] = sourceVal;
+      }
+    });
+  }
+
+  return target;
+}
+
 //  await the function call, no need for unnecessary awaits
 export const wrapAsync = async (func: Function, ...params) => {
   return new Promise( (resolve, reject) => {
