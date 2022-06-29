@@ -27,29 +27,29 @@ export class KeyValStoreRoute extends BaseRoute {
     this.router.post(keyValStoreRouteMapping.store.subRouteMapping.flush.name, this.flush.bind(this));
   }
 
-  async get(req: Request, res: Response, next: NextFunction) {
+  private async get(req: Request, res: Response, next: NextFunction) {
     const getReq: KeyValStoreGetRequest = req.body;
-    await this.performRouteAction({ method: 'get', customMsg: keyValStoreRouteMapping.store.subRouteMapping.get }, req, res, next, getReq.topic, getReq.findKey);
+    await this.performRouteAction({ method: keyValStoreRouteMapping.store.subRouteMapping.get.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.get }, req, res, next, getReq.topic, getReq.findKey);
   }
 
-  async set(req: Request, res: Response, next: NextFunction) {
+  private async set(req: Request, res: Response, next: NextFunction) {
     const setReq: KeyValStoreSetRequest = req.body;
-    await this.performRouteAction({ method: 'set', customMsg: keyValStoreRouteMapping.store.subRouteMapping.set }, req, res, next, setReq.setOpts);
+    await this.performRouteAction({ method: keyValStoreRouteMapping.store.subRouteMapping.set.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.set }, req, res, next, setReq.setOpts);
   }
 
-  async delete(req: Request, res: Response, next: NextFunction) {
+  private async delete(req: Request, res: Response, next: NextFunction) {
     const deleteReq: KeyValStoreGetRequest = req.body;
-    await this.performRouteAction({ method: 'delete', customMsg: keyValStoreRouteMapping.store.subRouteMapping.delete }, req, res, next, deleteReq.topic, deleteReq.findKey);
+    await this.performRouteAction({ method: keyValStoreRouteMapping.store.subRouteMapping.delete.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.delete }, req, res, next, deleteReq.topic, deleteReq.findKey);
   }
 
-  async current(req: Request, res: Response, next: NextFunction) {
+  private async current(req: Request, res: Response, next: NextFunction) {
     const topicReq: KeyValStoreTopicRequest | null = req.body || null;
-    await this.performRouteAction({ method: 'current', customMsg: keyValStoreRouteMapping.store.subRouteMapping.current }, req, res, next, topicReq?.topic);
+    await this.performRouteAction({ method: keyValStoreRouteMapping.store.subRouteMapping.current.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.current }, req, res, next, topicReq?.topic);
   }
 
-  async flush(req: Request, res: Response, next: NextFunction) {
+  private async flush(req: Request, res: Response, next: NextFunction) {
     const topicReq: KeyValStoreTopicRequest | null = req.body || null;
-    await this.performRouteAction({ method: 'flush', customMsg: keyValStoreRouteMapping.store.subRouteMapping.flush }, req, res, next, topicReq?.topic);
+    await this.performRouteAction({ method: keyValStoreRouteMapping.store.subRouteMapping.flush.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.flush }, req, res, next, topicReq?.topic);
   }
 
   async validateRoute(req: Request, res: Response, next: NextFunction): Promise<boolean> {

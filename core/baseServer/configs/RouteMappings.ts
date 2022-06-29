@@ -12,10 +12,12 @@ import { IBaseRoute } from '@core/baseServer/core/models/IRouteMappings';
 */
 export const routeMappings: Record<string, IBaseRoute>= {
   poll: {
-    name: "/poll",
+    key: 'poll',
+    name: '/poll',
     subRouteMapping: {
       root: {
-        name: "/",
+        key: 'root',
+        name: '/',
         customConsoleMessages: [
           {
             1: { 
@@ -27,7 +29,7 @@ export const routeMappings: Record<string, IBaseRoute>= {
               color: STATUSOK 
             },
             3: { 
-              text: 'Healthcheck success...', 
+              text: 'healthcheck success...', 
               color: INFO 
             }
           }

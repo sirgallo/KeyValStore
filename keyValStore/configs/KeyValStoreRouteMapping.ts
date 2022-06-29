@@ -3,9 +3,11 @@ import { IBaseRoute } from '@core/baseServer/core/models/IRouteMappings'
 
 export const keyValStoreRouteMapping: Record<string, IBaseRoute>= {
   store: {
+    key: 'store',
     name: '/store',
     subRouteMapping: {
       get: {
+        key: 'get',
         name: '/get',
         customConsoleMessages: [
           {
@@ -25,6 +27,7 @@ export const keyValStoreRouteMapping: Record<string, IBaseRoute>= {
         ]
       },
       set: {
+        key: 'set',
         name: '/set',
         customConsoleMessages: [
           {
@@ -44,6 +47,7 @@ export const keyValStoreRouteMapping: Record<string, IBaseRoute>= {
         ]
       },
       delete: {
+        key: 'delete',
         name: '/delete',
         customConsoleMessages: [
           {
@@ -63,6 +67,7 @@ export const keyValStoreRouteMapping: Record<string, IBaseRoute>= {
         ]
       },
       current: {
+        key: 'current',
         name: '/current',
         customConsoleMessages: [
           {
@@ -82,6 +87,7 @@ export const keyValStoreRouteMapping: Record<string, IBaseRoute>= {
         ]
       },
       flush: {
+        key: 'flush',
         name: '/flush',
         customConsoleMessages: [
           {
