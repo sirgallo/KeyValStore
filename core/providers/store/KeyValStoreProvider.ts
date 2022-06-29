@@ -13,10 +13,10 @@ export class KeyValStoreProvider {
   private keyValStoreLog: LogProvider = new LogProvider(NAME);
 
   constructor() {}
-  
+
   async get(topic: string, key: string): Promise<KeyValStoreEntry> {
     const getHelper = (topic: string, key: string) => this.store[topic][key];
-    return await wrapAsync(getHelper, topic, key) as KeyValStoreEntry;
+    return wrapAsync(getHelper, topic, key) as KeyValStoreEntry;
   }
 
   async set(opts: KeyValStoreEntryOpts): Promise<KeyValStore> {
@@ -25,7 +25,7 @@ export class KeyValStoreProvider {
       return opts.entry || null;
     }
   
-    return await wrapAsync(setHelper, opts) as KeyValStoreEntry;
+    return wrapAsync(setHelper, opts) as Promise<KeyValStore>;
   }
 
   async delete(topic: string, key: string): Promise<KeyValStoreEntry> {
@@ -35,7 +35,7 @@ export class KeyValStoreProvider {
       return deletedElem;
     }
 
-    return await wrapAsync(deleteHelper, topic, key);
+    return wrapAsync(deleteHelper, topic, key) as Promise<KeyValStoreEntry>;
   }
 
   async current(topic?: string): Promise<KeyValStore> {
@@ -43,7 +43,7 @@ export class KeyValStoreProvider {
       return topic ? { [topic]: this.store[topic] } : this.store;
     }
 
-    return await wrapAsync(curHelper, topic) as KeyValStore;
+    return wrapAsync(curHelper, topic) as Promise<KeyValStore>;
   }
 
   async flush(topic?: string): Promise<boolean> {
