@@ -50,9 +50,10 @@ export class KeyValStoreProvider {
     return keys.reduce( (acc: KeyValStoreEntry[], key) => { 
       if (this.store[topic][key]) {
         const val = this.store[topic][key];
-        if (del) delete this.store[topic][key]
-        return acc.concat({ [key]: val })
+        if (del) delete this.store[topic][key];
+        return acc.concat({ [key]: val });
       };
+
       return acc;
     }, []);
   }
