@@ -44,5 +44,4 @@ export class EventDrivenLogProvider {
       if (this.eventQueue.length > 0) { /* do nothing for now */ }
     });
   }
-  
 }
