@@ -20,7 +20,6 @@ export class KeyValStoreProvider {
 
   async get(key: string): Promise<KeyValStoreEntry> {
     const getHelper = (key: string) => this.store[key];
-
     return await wrapAsync(getHelper, key) as KeyValStoreEntry;
   }
 
@@ -29,25 +28,22 @@ export class KeyValStoreProvider {
       this.store[opts.key] = opts.entry;
       return this.store[opts.key] || null;
     }
-    
+  
     return await wrapAsync(setHelper, opts) as KeyValStoreEntry;
   }
 
   async delete(key: string) {
     const deleteHelper = (key: string) => delete this.store[key];
-
     await wrapAsync(deleteHelper, key);
   }
 
   async current(): Promise<KeyValStore> {
     const curHelper = () => this.store;
-    
     return await wrapAsync(curHelper, null) as KeyValStore;
   }
 
   async flush() {
     const flushHelper = () => this.store = {};
-
     await wrapAsync(flushHelper, null);
   }
 }
