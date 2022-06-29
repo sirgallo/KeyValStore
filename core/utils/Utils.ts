@@ -9,6 +9,7 @@ export const sleep = async (timeout: number) => new Promise(res => setTimeout(re
 
 export const isAtMaxMem = (usedMem: number): boolean => usedMem >= freemem();
 
+//  await the function call, no need for unnecessary awaits
 export const wrapAsync = async (func: Function, ...params) => {
   return new Promise( (resolve, reject) => {
     try {
