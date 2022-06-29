@@ -1,11 +1,9 @@
-export interface KeyValStoreEntry {
-  topic: string;
-  key: string;
-  value: any;
-}
+export type KeyValStoreEntry = any;
+export type Topic = string;
+export type Key = string;
 
 export interface KeyValStoreEntryOpts {
-  entry: KeyValStoreEntry;
+  entry: Record<Topic, Record<Key, KeyValStoreEntry>>;
 }
 
-export type KeyValStore = Record<string, Record<string, KeyValStoreEntry>>;
+export type KeyValStore = Record<Topic, Record<Key, KeyValStoreEntry>>;

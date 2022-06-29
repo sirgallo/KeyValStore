@@ -7,7 +7,8 @@ import { KeyValStoreProvider } from '@core/providers/store/KeyValStoreProvider';
 import { keyValStoreRouteMapping } from '@keyValStore/configs/KeyValStoreRouteMapping';
 import { 
   KeyValStoreGetRequest,
-  KeyValStoreSetRequest
+  KeyValStoreSetRequest,
+  KeyValStoreTopicRequest
 } from '@keyValStore/models/KeyValStoreRequest';
 import { KeyValStore, KeyValStoreEntry } from '@core/models/store/KeyValStore';
 
@@ -79,9 +80,11 @@ export class KeyValStoreRoute extends BaseRoute {
   }
 
   async current(req: Request, res: Response, next: NextFunction) {
+    const topicReq: KeyValStoreTopicRequest | null = req.body || null;
+
     try {
-      const resp: KeyValStore = await this.keyValStoreProv.current();
-      this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.delete.customConsoleMessages[0], true);
+      const resp: KeyValStore = await this.keyValStoreProv.current(topicReq?.topic);
+      this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.current.customConsoleMessages[0], true);
 
       res
         .status(200)
@@ -94,8 +97,10 @@ export class KeyValStoreRoute extends BaseRoute {
   }
 
   async flush(req: Request, res: Response, next: NextFunction) {
+    const topicReq: KeyValStoreTopicRequest | null = req.body || null;
+
     try {
-      await this.keyValStoreProv.flush()
+      await this.keyValStoreProv.flush(topicReq?.topic);
       this.log.custom(keyValStoreRouteMapping.store.subRouteMapping.flush.customConsoleMessages[0], true);
 
       res
