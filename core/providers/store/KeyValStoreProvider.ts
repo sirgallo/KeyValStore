@@ -34,8 +34,6 @@ export class KeyValStoreProvider {
         this.store.version++;
   
         return opts.entry || null;
-      } else {
-        console.log('memoized')
       }
     }
   
