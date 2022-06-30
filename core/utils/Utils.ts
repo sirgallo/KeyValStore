@@ -1,4 +1,5 @@
 import { freemem } from 'os';
+import { isEqual } from 'lodash';
 
 import { SimpleQueueProvider } from '@core/providers/queue/SimpleQueueProvider';
 
@@ -31,6 +32,8 @@ export const mergeDeep = (target: any, source: any, depth?: number) => {
 
   return target;
 }
+
+export const memo = (target: any, source: any): boolean => isEqual(target, source);
 
 //  await the function call, no need for unnecessary awaits
 export const wrapAsync = async (func: Function, ...params) => {

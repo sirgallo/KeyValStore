@@ -7,16 +7,17 @@ import { keyValStoreRouteMapping } from '@keyValStore/configs/KeyValStoreRouteMa
 import { KeyValStoreProvider } from '@core/providers/store/KeyValStoreProvider';
 import { EventDrivenLogRoute } from './routes/EventDrivenLogRoute';
 import { eventDrivenLogRouteMapping } from './configs/EventDrivenLogRouteMapping';
+import { GossipProtocolProvider } from '@core/providers/replication/GossipProvider';
 
 export class InitKeyValStoreService extends BaseServer {
   private keyValInitLog: LogProvider = new LogProvider(`${this.name} Init`);
+  private keyValStoreProv: KeyValStoreProvider = new KeyValStoreProvider();
 
   constructor(
     name: string, 
     port?: number, 
     version?: string, 
-    numOfCpus?: number, 
-    private keyValStoreProv: KeyValStoreProvider = new KeyValStoreProvider()
+    numOfCpus?: number
   ) { super(name, port, version, numOfCpus); }
 
   async startServer() {
@@ -24,8 +25,11 @@ export class InitKeyValStoreService extends BaseServer {
       const eventLog: EventDrivenLogProvider = new EventDrivenLogProvider();
       eventLog.start();
 
+      const gossipProvider: GossipProtocolProvider = new GossipProtocolProvider(eventLog, this.keyValStoreProv, 0);
+      gossipProvider.start();
+
       const keyValRoute = new KeyValStoreRoute(keyValStoreRouteMapping.store.name, this.keyValStoreProv, eventLog);
-      const eventLogRoute = new EventDrivenLogRoute(eventDrivenLogRouteMapping.store.name, eventLog);
+      const eventLogRoute = new EventDrivenLogRoute(eventDrivenLogRouteMapping.store.name, eventLog, gossipProvider);
 
       this.setRoutes([ 
         keyValRoute,

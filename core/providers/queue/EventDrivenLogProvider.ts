@@ -25,6 +25,10 @@ export class EventDrivenLogProvider {
     return this.eventQueue.length;
   }
 
+  getInternalQueueRef() {
+    return this.eventQueue;
+  }
+
   addLog(entry: EventDrivenLogEntry): boolean {
     this.eventQueue.enqueue(entry);
 

@@ -1,6 +1,6 @@
 import { cloneDeep, mergeWith, isArray } from 'lodash';
 
-import { mergeDeep, wrapAsync } from '@core/utils/Utils';
+import { memo, mergeDeep, wrapAsync } from '@core/utils/Utils';
 import { 
   KeyValStore, 
   KeyValStoreEntry, 
@@ -11,7 +11,11 @@ import { LogProvider } from '@core/providers/LogProvider';
 const NAME = 'Key Value Store Provider';
 
 export class KeyValStoreProvider {
-  private store: KeyValStore = {};
+  private store: KeyValStore = {
+    store: {},
+    version: 0
+  };
+
   private keyValStoreLog: LogProvider = new LogProvider(NAME);
 
   constructor() {}
@@ -22,11 +26,17 @@ export class KeyValStoreProvider {
 
   async set(opts: KeyValStoreEntryOpts): Promise<KeyValStore> {
     const setHelper = (opts: KeyValStoreEntryOpts) => {
-      this.store = mergeWith(this.store, opts.entry, (obj, src) => { 
-        if(isArray(obj)) return obj.concat(src) 
-      });
-
-      return opts.entry || null;
+      if (! memo(this.store.store, opts.entry)) {
+        this.store.store = mergeWith(this.store.store, opts.entry, (obj, src) => { 
+          if(isArray(obj)) return obj.concat(src) 
+        });
+  
+        this.store.version++;
+  
+        return opts.entry || null;
+      } else {
+        console.log('memoized')
+      }
     }
   
     return wrapAsync(setHelper, opts) as Promise<KeyValStore>;
@@ -38,14 +48,14 @@ export class KeyValStoreProvider {
 
   async current(topic?: string): Promise<KeyValStore> {
     const curHelper = (topic?: string) => {
-      return topic ? { [topic]: this.store[topic] } : this.store;
+      return topic ? { store: { [topic]: this.store.store[topic] }, version: this.store.version } : this.store;
     }
 
     return wrapAsync(curHelper, topic) as Promise<KeyValStore>;
   }
 
   async flush(topic?: string): Promise<boolean> {
-    const flushHelper = (topic?: string) => topic ? this.store[topic] = {} : this.store = {};
+    const flushHelper = (topic?: string) => topic ? this.store.store[topic] = {} : this.store.store = {};
     await wrapAsync(flushHelper, topic);
 
     return true;
@@ -53,9 +63,9 @@ export class KeyValStoreProvider {
 
   private multiValReducer(topic: string, keys: string[], del?: boolean): KeyValStoreEntry[] {
     return keys.reduce( (acc: KeyValStoreEntry[], key: string) => { 
-      if (this.store?.[topic]?.[key]) {
-        const val = this.store[topic][key];
-        if (del) delete this.store[topic][key];
+      if (this.store?.store?.[topic]?.[key]) {
+        const val = this.store.store[topic][key];
+        if (del) delete this.store.store[topic][key];
         return acc.concat({ [key]: val });
       };
 

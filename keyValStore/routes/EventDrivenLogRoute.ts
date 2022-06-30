@@ -6,13 +6,14 @@ import { extractErrorMessage } from '@core/utils/Utils';
 
 import { eventDrivenLogRouteMapping } from '@keyValStore/configs/EventDrivenLogRouteMapping';
 import { EventDrivenLogProvider } from '@core/providers/queue/EventDrivenLogProvider';
+import { GossipProtocolProvider } from '@core/providers/replication/GossipProvider';
 
 const NAME = 'Event Driven Log Route';
 
 export class EventDrivenLogRoute extends BaseRoute {
   private log: LogProvider = new LogProvider(NAME);
 
-  constructor(rootpath: string, private eventLog: EventDrivenLogProvider) {
+  constructor(rootpath: string, private eventLog: EventDrivenLogProvider, private gossipProv: GossipProtocolProvider) {
     super(rootpath);
     this.log.initFileLogger();
 
