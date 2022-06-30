@@ -1,4 +1,4 @@
-const path = require('path');
+import path from 'path';
 
 import { promisify } from 'util';
 import { writeFile, existsSync, readFile, mkdir, appendFile } from 'fs';

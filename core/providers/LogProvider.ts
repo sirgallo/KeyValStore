@@ -1,4 +1,4 @@
-const path = require('path');
+import path from 'path'
 
 import { IFileOpOpts } from '@core/models/filesystem/IFileOp';
 import {
@@ -18,7 +18,9 @@ import { randomUUID } from 'crypto';
 export class LogProvider {
   private log = console.log;
   private table = console.table;
+  
   fileSystemLog: FileSystemLogProvider;
+  
   constructor(private baseName: string) {}
 
   initFileLogger(logPath?: string) {
@@ -62,8 +64,7 @@ export class LogProvider {
   }
   
   boolean(bool: boolean) {
-    if (bool) this.log(BASE(this.formatBaseName()), STATUSOK(bool));
-    else this.log(BASE(this.formatBaseName()), ERROR(false));
+    bool ? this.log(BASE(this.formatBaseName()), STATUSOK(bool)) : this.log(BASE(this.formatBaseName()), ERROR(false));
   }
 
   custom(message: CustomMessageWrap, newLine?: boolean) {
@@ -71,7 +72,7 @@ export class LogProvider {
       .map(key => message[key].color(message[key].text))
       .join(' ');
 
-    if(newLine) this.log();
+    if (newLine) this.log();
     this.log(BASE(this.formatBaseName()), finalMessage);
   }
 

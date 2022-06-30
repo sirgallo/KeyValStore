@@ -13,6 +13,8 @@ import { routeMappings } from '@core/baseServer/configs/RouteMappings';
 const NAME = 'Poll Route'
 
 export class PollRoute extends BaseRoute {
+  name = NAME;
+  
   private log: LogProvider = new LogProvider(NAME);
   
   constructor(rootpath: string) {

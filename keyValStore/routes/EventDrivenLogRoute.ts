@@ -11,6 +11,8 @@ import { GossipProtocolProvider } from '@core/providers/replication/GossipProvid
 const NAME = 'Event Driven Log Route';
 
 export class EventDrivenLogRoute extends BaseRoute {
+  name = NAME;
+  
   private log: LogProvider = new LogProvider(NAME);
 
   constructor(rootpath: string, private eventLog: EventDrivenLogProvider, private gossipProv: GossipProtocolProvider) {

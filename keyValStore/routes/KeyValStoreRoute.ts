@@ -16,13 +16,11 @@ import { EventDrivenLogProvider } from '@core/providers/queue/EventDrivenLogProv
 const NAME = 'Key Value Store Route';
 
 export class KeyValStoreRoute extends BaseRoute {
+  name = NAME;
+  
   private log: LogProvider = new LogProvider(NAME);
 
-  constructor(
-    rootpath: string, 
-    private keyValStoreProv: KeyValStoreProvider, 
-    private eventLog: EventDrivenLogProvider
-  ) {
+  constructor(rootpath: string, private keyValStoreProv: KeyValStoreProvider, private eventLog: EventDrivenLogProvider) {
     super(rootpath);
     this.log.initFileLogger();
 

@@ -1,6 +1,7 @@
-const cluster = require('cluster');
-const path = require('path');
-const express = require('express');
+import cluster from 'cluster';
+import path from 'path';
+
+import express from 'express';
 
 import { config } from 'dotenv';
 import * as os from 'os';
@@ -12,9 +13,7 @@ import compression from 'compression';
 import helmet from 'helmet';
 
 import { LogProvider } from '@core/providers/LogProvider';
-import { ITimerMap, elapsedTimeInMs } from'@core/utils/Timer';
 import { PollRoute } from '@core/baseServer/routes/PollRoute';
-
 import { routeMappings } from '@core/baseServer/configs/RouteMappings';
 
 config({ path: '.env' });
@@ -31,33 +30,24 @@ Base Server
       --> listen on default port
 */
 
-async function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 export class BaseServer {
   name: string;
+
   private app: e.Application;
   private ip: string;
   private numOfCpus: number = os.cpus().length;
 
   private log: LogProvider;
-  private timerMap: ITimerMap;
 
   private routes: any[] = [ new PollRoute(routeMappings.poll.name) ];
 
-  constructor(
-    name: string,
-    private port?: number, 
-    private version?: string,
-    numOfCpus?: number
-  ) {
+  constructor(name: string, private port: number = 8000, private version: string = '0.1', numOfCpus?: number) {
     this.name = name;
+
     this.log = new LogProvider(this.name);
     this.log.initFileLogger(process.cwd());
     //  default values
-    if (! port) this.port = 8000;
-    if (! version) this.version = '0.1';
     if (numOfCpus) this.numOfCpus = numOfCpus;
   }
 
@@ -70,33 +60,15 @@ export class BaseServer {
   }
 
   async run() {
-    if (cluster.isMaster) {
-      this.timerMap = {
-        baseName: 'Base Server Timer',
-        timerMap: {
-          startService: {
-            start: new Date(),
-            stop: null,
-            elapsedInMs: null
-          }
-        }
-      }
-    }
-
     try { 
+      this.log.info(`Welcome to ${this.name}, version ${this.version}`);
       if (this.numOfCpus > 1) {
-        if (cluster.isMaster) {
-          await this.log.getFileSystem().writeLogToFile(`Welcome to ${this.name}, version ${this.version}, forking workers...`, this.name);
+        if (cluster.isPrimary) {
+          this.log.info(`Welcome to ${this.name}, version ${this.version}, forking workers...`);
 
           this.ip = BaseServer.setIp(this.log);
           this.app = express();
           this.setUpWorkers();
-
-          this.timerMap.timerMap.startService.stop = new Date();
-          this.timerMap.timerMap.startService.elapsedInMs = elapsedTimeInMs(
-            this.timerMap.timerMap.startService.start, 
-            this.timerMap.timerMap.startService.stop
-          );
         } else if (cluster.isWorker) {
           this.app = express();
           this.initApp();
@@ -104,8 +76,6 @@ export class BaseServer {
           this.setUpServer();
         }
       } else if (this.numOfCpus === 1) {
-        await this.log.getFileSystem().writeLogToFile(`Welcome to ${this.name}, version ${this.version}`, this.name);
-
         this.app = express();
         this.initApp();
         this.initRoutes();
@@ -114,15 +84,7 @@ export class BaseServer {
         throw new Error('Number of cpus must be greater than 1.');
       }
     } catch (err) {
-      this.log.getFileSystem().error(JSON.stringify({ err }, null, 2));
-      
-      this.timerMap.timerMap.startService.stop = new Date();
-      this.timerMap.timerMap.startService.elapsedInMs = elapsedTimeInMs(
-        this.timerMap.timerMap.startService.start, 
-        this.timerMap.timerMap.startService.stop
-      );
-      
-      this.log.getFileSystem().debug(`Timer: ${this.timerMap.timerMap.startService.elapsedInMs}`);
+      this.log.error(JSON.stringify({ err }, null, 2));
       process.exit(1);
     }
   }
@@ -142,7 +104,7 @@ export class BaseServer {
   private initRoutes() {
     for (const route of this.routes) {
       this.app.use(route.rootpath, route.router);
-      this.log.getFileSystem().writeLogToFile(`Route: ${route.name} initialized on Worker ${process.pid}.`, this.name);
+      this.log.info(`Route: ${route.name} initialized on Worker ${process.pid}.`);
     }
 
     this.app.use( (req, res, next) => {
@@ -159,32 +121,33 @@ export class BaseServer {
 
   private setUpServer() {
     this.app.listen(this.port, () => {
-      this.log.getFileSystem().writeLogToFile(`Server ${process.pid} @${this.ip} listening on port ${this.port}...`, this.name);
+      this.log.info(`Server ${process.pid} @${this.ip} listening on port ${this.port}...`);
     });
   }
 
   private setUpWorkers() {
-    this.log.getFileSystem().writeLogToFile(`Server @${this.ip} setting up ${this.numOfCpus} CPUs as workers.\n`, this.name);
-
-    for(let cpu = 0; cpu < this.numOfCpus; cpu++) {
-      const fork = cluster.fork();
-      fork.on('message', message => {
-        this.log.getFileSystem().debug(message);
+    const fork = () => {
+      const f = cluster.fork();
+      f.on('message', message => {
+        this.log.debug(message);
       });
     }
 
+    this.log.info(`Server @${this.ip} setting up ${this.numOfCpus} CPUs as workers.\n`);
+
+    for(let cpu = 0; cpu < this.numOfCpus; cpu++) {
+      fork();
+    }
+
     cluster.on('online', worker => {
-      this.log.getFileSystem().writeLogToFile(`Worker ${worker.process.pid} is online.`, this.name);
+      this.log.info(`Worker ${worker.process.pid} is online.`);
     });
 
     cluster.on('exit', (worker, code, signal) => {
-      this.log.getFileSystem().error(`Worker ${worker.process.pid} died with code ${code} and ${signal}.`);
-      this.log.getFileSystem().warn('Starting new worker...');
+      this.log.error(`Worker ${worker.process.pid} died with code ${code} and ${signal}.`);
+      this.log.warn('Starting new worker...');
 
-      const fork = cluster.fork()
-      fork.on('message', message => {
-        this.log.getFileSystem().writeLogToFile(message, this.name);
-      });
+      fork();
     })
   }
 

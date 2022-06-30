@@ -13,8 +13,8 @@ export interface RouteOpts {
 
 
 export abstract class BaseRoute {
-  protected router: Router;
   protected name: string;
+  protected router: Router;
   protected rootpath: string;
   
   constructor(rootpath: string) {

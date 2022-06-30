@@ -43,8 +43,6 @@ export class GossipProtocolProvider {
     this.bucket = {
       [this.systemUUID]: this.eventLog.getInternalQueueRef()
     }
-
-    console.log(this.bucket);
   }
 
   initializeRandomPeers() {
