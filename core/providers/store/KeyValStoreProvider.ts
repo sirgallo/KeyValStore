@@ -25,12 +25,10 @@ export class KeyValStoreProvider {
   }
 
   async set(opts: KeyValStoreEntryOpts): Promise<KeyValStore> {
+    const customMerge = (obj: any, src: any) => { if (isArray(obj)) return obj.concat(src); }
     const setHelper = (opts: KeyValStoreEntryOpts) => {
       if (! memo(this.store.store, opts.entry)) {
-        this.store.store = mergeWith(this.store.store, opts.entry, (obj, src) => { 
-          if(isArray(obj)) return obj.concat(src) 
-        });
-  
+        this.store.store = mergeWith(this.store.store, opts.entry, customMerge);
         this.store.version++;
   
         return opts.entry || null;
@@ -64,6 +62,7 @@ export class KeyValStoreProvider {
       if (this.store?.store?.[topic]?.[key]) {
         const val = this.store.store[topic][key];
         if (del) delete this.store.store[topic][key];
+        
         return acc.concat({ [key]: val });
       };
 

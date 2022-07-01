@@ -7,7 +7,7 @@ export const serverConfiguration: ServerConfiguration<Record<string, IServerConf
   keyValStore: {
     port: 9876,
     name: 'Key Value Store API',
-    numOfCpus: 3,
+    numOfCpus: 1,
     version: '0.0.1-dev'
   }
 }
