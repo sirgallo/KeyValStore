@@ -1,3 +1,5 @@
+import got from 'got';
+
 import { sleep } from '@core/utils/Utils';
 import { LogProvider } from '@core/providers/LogProvider';
 
@@ -6,13 +8,12 @@ const log = new LogProvider('Async Exponential Backoff');
 export async function asyncExponentialBackoff(
   endpoint: string,
   retries: number, 
-  timeout: number, 
-  reqFunction: Function, 
+  timeout: number,
   request: any,
   depth = 1): Promise<any> {
   try {
     if (depth > retries) throw new Error(`Exceeded Max Retries: ${retries}`);
-    else return await reqFunction(endpoint, request);
+    return await got.post(endpoint, request).json() as any;
   } catch (err) {
     if (depth > retries) throw err;
     else {
@@ -22,7 +23,7 @@ export async function asyncExponentialBackoff(
       log.info(`Waiting for: ${newTimeout}ms`);
 
       await sleep(newTimeout);
-      return await asyncExponentialBackoff(endpoint, retries, timeout, reqFunction, request, depth + 1);
+      return await asyncExponentialBackoff(endpoint, retries, timeout, request, depth + 1);
     }
   }
 }

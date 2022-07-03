@@ -7,10 +7,10 @@ import { extractErrorMessage } from '@core/utils/Utils';
 
 import { keyValStoreRouteMapping } from '@keyValStore/configs/KeyValStoreRouteMapping';
 import { 
+  KeyValStoreEntryOpts,
   KeyValStoreGetRequest,
-  KeyValStoreSetRequest,
   KeyValStoreTopicRequest
-} from '@keyValStore/models/KeyValStoreRequest';
+} from '@core/models/store/KeyValStore';
 import { EventDrivenLogProvider } from '@core/providers/queue/EventDrivenLogProvider';
 
 const NAME = 'Key Value Store Route';
@@ -33,19 +33,20 @@ export class KeyValStoreRoute extends BaseRoute {
 
   private async get(req: Request, res: Response, next: NextFunction) {
     const getReq: KeyValStoreGetRequest = req.body;
+    console.log('get request:', getReq);
     await this.pipeRequest(
       { method: keyValStoreRouteMapping.store.subRouteMapping.get.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.get }, 
       req, res, next, 
-      getReq.topic, getReq.findKey
+      getReq
     );
   }
 
   private async set(req: Request, res: Response, next: NextFunction) {
-    const setReq: KeyValStoreSetRequest = req.body;
+    const setReq: KeyValStoreEntryOpts = req.body;
     await this.pipeRequest(
       { method: keyValStoreRouteMapping.store.subRouteMapping.set.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.set }, 
       req, res, next, 
-      setReq.setOpts
+      setReq
     );
   }
 
@@ -54,7 +55,7 @@ export class KeyValStoreRoute extends BaseRoute {
     await this.pipeRequest(
       { method: keyValStoreRouteMapping.store.subRouteMapping.delete.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.delete }, 
       req, res, next, 
-      deleteReq.topic, deleteReq.findKey, deleteReq?.del
+      deleteReq
     );
   }
 
@@ -63,7 +64,7 @@ export class KeyValStoreRoute extends BaseRoute {
     await this.pipeRequest(
       { method: keyValStoreRouteMapping.store.subRouteMapping.current.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.current }, 
       req, res, next, 
-      topicReq?.topic
+      topicReq
     );
   }
 
@@ -72,7 +73,7 @@ export class KeyValStoreRoute extends BaseRoute {
     await this.pipeRequest(
       { method: keyValStoreRouteMapping.store.subRouteMapping.flush.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.flush }, 
       req, res, next, 
-      topicReq?.topic
+      topicReq
     );
   }
 

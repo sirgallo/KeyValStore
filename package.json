@@ -3,8 +3,8 @@
   "version": "0.0.1-dev",
   "scripts": {
     "build:all": "grunt --gruntfile gruntfile.js",
-    "start:keyval": "node ./dist/keyValStore/StartKeyValStoreService.js --color",
-    "start:repkvs": "node ./dist/repKVS/StartKVSService.js --color"
+    "start:keyval": "node ./dist/keyValStore/StartKeyValStoreService.js --experimental-fetch --color",
+    "cli": "node ./dist/cli/CLI.js --experimental-fetch --color"
   },
   "author": "Sir Gallo",
   "license": "ISC",
@@ -18,6 +18,7 @@
     "csurf": "^1.11.0",
     "dotenv": "^10.0.0",
     "express": "^4.18.1",
+    "got": "^11.8.3",
     "grunt": "^1.5.3",
     "grunt-ts": "^6.0.0-beta.22",
     "helmet": "^5.1.0",
@@ -27,6 +28,7 @@
     "module-alias": "^2.2.2",
     "mongoose": "^6.4.1",
     "morgan": "^1.10.0",
+    "node-fetch": "^3.2.6",
     "os": "^0.1.2",
     "passport-jwt": "^4.0.0",
     "typescript": "^4.7.4",
@@ -47,8 +49,8 @@
   },
   "_moduleAliases": {
     "@core": "./dist/core",
+    "@cli": "./dist/cli",
     "@baseServer": "./dist/core/baseServer",
-    "@keyValStore": "./dist/keyValStore",
-    "@repKVS": "./dist/repKVS"
+    "@keyValStore": "./dist/keyValStore"
   }
 }

@@ -20,9 +20,9 @@
     "baseUrl": "./",
     "paths": {
       "@core/*": ["core/*"],
+      "@cli/*": ["cli/*"],
       "@baseServer/*": ["core/baseServer/*"],
-      "@keyValStore/*": ["keyValStore/*"],
-      "@repKVS/*": ["repKVS/*"]
+      "@keyValStore/*": ["keyValStore/*"]
     }
   }
 }

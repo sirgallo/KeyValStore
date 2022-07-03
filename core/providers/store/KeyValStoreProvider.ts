@@ -4,15 +4,19 @@ import { memo, wrapAsync } from '@core/utils/Utils';
 import { 
   KeyValStore, 
   KeyValStoreEntry, 
-  KeyValStoreEntryOpts 
+  KeyValStoreEntryOpts,
+  KeyValStoreGetRequest,
+  KeyValEndpoints,
+  KeyValStoreTopicRequest
 } from '@core/models/store/KeyValStore';
 import { LogProvider } from '@core/providers/LogProvider';
 
 const NAME = 'Key Value Store Provider';
 
-export class KeyValStoreProvider {
+export class KeyValStoreProvider implements KeyValEndpoints {
   private store: KeyValStore = {
     store: {},
+    topics: {},
     version: 0
   };
 
@@ -20,8 +24,9 @@ export class KeyValStoreProvider {
 
   constructor() {}
 
-  async get(topic: string, keys: string[]): Promise<KeyValStoreEntry[]> {
-    return wrapAsync(this.multiValReducer.bind(this), topic, keys) as Promise<KeyValStoreEntry[]>;
+  async get(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry[]> {
+    console.log(opts);
+    return wrapAsync(this.multiValReducer.bind(this), opts.topic, opts.findKey) as Promise<KeyValStoreEntry[]>;
   }
 
   async set(opts: KeyValStoreEntryOpts): Promise<KeyValStore> {
@@ -38,23 +43,33 @@ export class KeyValStoreProvider {
     return wrapAsync(setHelper, opts) as Promise<KeyValStore>;
   }
 
-  async delete(topic: string, keys: string[]): Promise<KeyValStoreEntry[]> {
-    return wrapAsync(this.multiValReducer.bind(this), topic, keys, true) as Promise<KeyValStoreEntry[]>;
+  async delete(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry[]> {
+    return wrapAsync(this.multiValReducer.bind(this), opts.topic, opts.findKey, true) as Promise<KeyValStoreEntry[]>;
   }
 
-  async current(topic?: string): Promise<KeyValStore> {
+  async current(opts: KeyValStoreTopicRequest): Promise<KeyValStore> {
     const curHelper = (topic?: string) => {
-      return topic ? { store: { [topic]: this.store.store[topic] }, version: this.store.version } : this.store;
+      return topic 
+        ? { 
+          store: { [topic]: this.store.store[topic] }, 
+          topic: this.store.topics[topic], 
+          version: this.store.version 
+        } 
+        : this.store;
     }
 
-    return wrapAsync(curHelper, topic) as Promise<KeyValStore>;
+    return wrapAsync(curHelper, opts.topic) as Promise<KeyValStore>;
   }
 
-  async flush(topic?: string): Promise<boolean> {
+  async flush(opts: KeyValStoreTopicRequest): Promise<boolean> {
     const flushHelper = (topic?: string) => topic ? this.store.store[topic] = {} : this.store.store = {};
-    await wrapAsync(flushHelper, topic);
+    await wrapAsync(flushHelper, opts.topic);
 
     return true;
+  }
+
+  private validateSchemaType(incomingEntry: any): boolean {
+    return false;
   }
 
   private multiValReducer(topic: string, keys: string[], del?: boolean): KeyValStoreEntry[] {
