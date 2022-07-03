@@ -25,7 +25,6 @@ export class KeyValStoreProvider implements KeyValEndpoints {
   constructor() {}
 
   async get(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry[]> {
-    console.log(opts);
     return wrapAsync(this.multiValReducer.bind(this), opts.topic, opts.findKey) as Promise<KeyValStoreEntry[]>;
   }
 

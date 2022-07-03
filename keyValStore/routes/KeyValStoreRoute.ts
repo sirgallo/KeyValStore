@@ -33,7 +33,6 @@ export class KeyValStoreRoute extends BaseRoute {
 
   private async get(req: Request, res: Response, next: NextFunction) {
     const getReq: KeyValStoreGetRequest = req.body;
-    console.log('get request:', getReq);
     await this.pipeRequest(
       { method: keyValStoreRouteMapping.store.subRouteMapping.get.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.get }, 
       req, res, next, 
