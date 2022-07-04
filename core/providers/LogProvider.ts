@@ -9,9 +9,10 @@ import {
 
 import { FileOpProvider } from '@core/providers/filesystem/FileOpProvider';
 import { randomUUID } from 'crypto';
+
 /*
   Log Provider provides colored logs, as well as the ability to create custom logs
-
+  
   Provide base name to constructor so that the log has a predefined location
 */
 

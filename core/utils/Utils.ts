@@ -20,13 +20,11 @@ export const mergeDeep = (target: any, source: any, depth?: number) => {
       const targetVal = target[key];
       const sourceVal = source[key];
 
-      if (targetVal instanceof Array && sourceVal instanceof Array) {
-        target[key] =  targetVal.concat(sourceVal);
-      } else if (targetVal instanceof Object && sourceVal instanceof Object) {
-        target[key] = mergeDeep(Object.assign({}, targetVal), sourceVal, depth ? depth-- : null);
-      } else {
-        target[key] = sourceVal;
-      }
+      targetVal instanceof Array && sourceVal instanceof Array
+        ? target[key] =  targetVal.concat(sourceVal)
+        : targetVal instanceof Object && sourceVal instanceof Object
+        ? target[key] = mergeDeep(Object.assign({}, targetVal), sourceVal, depth ? depth-- : null)
+        : target[key] = sourceVal;
     });
   }
 

@@ -17,8 +17,6 @@ export class EventDrivenLogProvider {
   start() {
     this.eventQueue = new SimpleQueueProvider(EVENT_NAME);
     this.eventQueueOn();
-
-    setIntervalQueue(this.eventQueue);
   }
 
   countLogs() {
