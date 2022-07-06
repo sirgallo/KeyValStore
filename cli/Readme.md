@@ -2,6 +2,14 @@
 
 `A command line tool for interacting with the key-val store`
 
+## Building
+
+**currently using node 18**
+
+```bash
+  npm install
+  npm run build:all
+```
 
 ## Operations
 
@@ -42,4 +50,10 @@
   npm run cli localhost 6789 FLUSH '{"topic": "<topic>"}'
 ```
 
-`
+## Importing into Project
+
+```ts
+import { CLIProvider } from '@cli/providers/CLIProvider';
+
+const resp = await this.cliProv[<method>](<payload>);
+```
