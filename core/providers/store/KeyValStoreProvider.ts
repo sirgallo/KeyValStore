@@ -125,14 +125,12 @@ export class KeyValStoreProvider implements KeyValEndpoints {
   }
 
   private inheritType(insertObject: KeyValStoreEntryOpts) {
-    if (! memo(this.store.store, insertObject.entry)) {
-      keysIn(insertObject.entry)
-        .forEach( topic => {
-          if (! this.store.store[topic]) {
-            const DeepCloneType = generateObjectSchema(insertObject.entry[topic] as any);
-            this.store.topics[topic] = { ...this.store.topics[topic], schema: DeepCloneType }
-          }
-        });
-    }
+    keysIn(insertObject.entry)
+      .forEach( topic => {
+        if (! this.store.store[topic]) {
+          const DeepCloneType = generateObjectSchema(insertObject.entry[topic] as any);
+          this.store.topics[topic] = { ...this.store.topics[topic], schema: DeepCloneType }
+        }
+      });
   }
 }
