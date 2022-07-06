@@ -21,7 +21,6 @@ export class KeyValStoreRoute extends BaseRoute {
   name = NAME;
   
   private log: LogProvider = new LogProvider(NAME);
-  private mutLock: boolean = false;
 
   constructor(
     rootpath: string, 
@@ -137,7 +136,7 @@ export class KeyValStoreRoute extends BaseRoute {
 
   private keyValQueueOn() {
     this.keyValOpQueue.queueUpdate.on(this.keyValOpQueue.eventName, async () => {
-      if (this.keyValOpQueue.length > 0 && ! this.mutLock) {
+      if (this.keyValOpQueue.length > 0) {
         const { opts, res, params } = this.keyValOpQueue.dequeue();
 
         try {
