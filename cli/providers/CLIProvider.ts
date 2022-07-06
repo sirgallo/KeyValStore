@@ -17,25 +17,25 @@ export class CLIProvider implements KeyValEndpoints {
     this.setEndpoints();
   }
 
-  async get(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry[]> {
+  async get(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry<any>[]> {
     return await asyncExponentialBackoff(
       this.endpoints.get, 5, 500, { json: opts }
     );
   }
 
-  async set(opts: KeyValStoreEntryOpts): Promise<KeyValStoreEntry> {
+  async set(opts: KeyValStoreEntryOpts): Promise<KeyValStoreEntry<any>> {
     return await asyncExponentialBackoff(
       this.endpoints.set, 5, 500, { json: opts }
     );
   }
 
-  async delete(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry[]> {
+  async delete(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry<any>[]> {
     return await asyncExponentialBackoff(
       this.endpoints.delete, 5, 500, { json: opts }
     );
   }
 
-  async current(opts: KeyValStoreTopicRequest): Promise<PartialKeyValStore> {
+  async current(opts: KeyValStoreTopicRequest): Promise<PartialKeyValStore<any, any>> {
     return await asyncExponentialBackoff(
       this.endpoints.current, 5, 500, { json: opts }
     );

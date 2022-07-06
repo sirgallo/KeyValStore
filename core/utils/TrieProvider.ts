@@ -9,21 +9,22 @@ import { wrapAsync } from '@core/utils/Utils';
     - end, a truthy value to assign the end of a word
   Methods are getters and setters
 */
+
 class TrieNode {
-  protected c: Record<string, TrieNode> = {};
-  protected end: boolean = false;
+  protected ctn: Record<string, TrieNode> = {};
+  protected end?: boolean;
   
-  constructor(protected e: string) {}
+  constructor(protected vtn: string) {}
 
-  getValue(): string { return this.e; }
+  getValue(): string { return this.vtn; }
 
-  getChildren(): Record<string, TrieNode> { return this.c; }
+  getChildren(): Record<string, TrieNode> { return this.ctn; }
 
-  getChild(field: string) { return this.c[field]; }
+  getChild(field: string) { return this.ctn[field]; }
 
-  setChild(field: string) { this.c[field] = new TrieNode(field); }
+  setChild(field: string) { this.ctn[field] = new TrieNode(field); }
 
-  getEnd(): boolean { return this.end; }
+  getEnd(): boolean { return this?.end; }
 
   setEnd(setField: boolean) { this.end = setField; }
 }
@@ -31,6 +32,7 @@ class TrieNode {
 /*
   The Trie data structure, which is built using individual nodes
 */
+
 export class Trie extends TrieNode {
   constructor() { super(null); }
 
@@ -47,7 +49,7 @@ export class Trie extends TrieNode {
         if (! node.getChild(str[0])) node.setChild(str[0]);
         
         if (str.length > 1 ) recursiveInsert(node.getChild(str[0]), str.slice(1));
-        else if(str.length === 1) node.getChild(str[0]).setEnd(true);
+        else if (str.length === 1) node.getChild(str[0]).setEnd(true);
       }
 
       recursiveInsert(this, str);
@@ -58,10 +60,10 @@ export class Trie extends TrieNode {
 
   async searchWord(word: string): Promise<string[]> {
     const words = [];
-    
+
     const searchHelper = (word: string) => {
-      const remainingTreeHelper = (node: TrieNode, word: string) => {
-        if (word) return remainingTreeHelper(node.getChild(word[0]), word.substring(1));
+      const remainingTreeHelper = (node: TrieNode, partialWord: string) => {
+        if (partialWord) return remainingTreeHelper(node.getChild(word[0]), partialWord.substring(1));
         else return node;
       }
 
@@ -70,14 +72,16 @@ export class Trie extends TrieNode {
           const child = tree.getChildren()[field];
           const newStr = wordSoFar + child.getValue();
     
-          if (child.getEnd()) words.push(newStr)
+          if (child.getEnd()) words.push(newStr);
           allWordsHelper(newStr, child);
         }
-      };
+      }
 
       const remainingTree = remainingTreeHelper(this, word);
+
       if (remainingTree) allWordsHelper(word, remainingTree);
-      
+      else allWordsHelper(word, this);
+
       return words;
     }
 

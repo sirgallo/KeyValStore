@@ -1,15 +1,19 @@
 # Key Val Store CLI/Provider
 
 `A command line tool for interacting with the key-val store`
+*performed within main project directory*
+
 
 ## Building
 
 **currently using node 18**
 
 ```bash
+  cd ./cli
   npm install
   npm run build:all
 ```
+
 
 ## Operations - DB OPS
 
@@ -50,6 +54,7 @@
   npm run cli localhost 6789 flush '{"topic": "<topic>"}'
 ```
 
+
 ## Operations - Index Ops
 
 `SearchKeys - Single Topic`
@@ -61,6 +66,7 @@
 ```bash
   npm run cli localhost 6789 searchTopics '{"topic": "<partialWord>"}'
 ```
+
 
 ## Importing into Project
 

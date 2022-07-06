@@ -22,9 +22,7 @@ export class IndexProvider implements IndexMethods {
   private indexLog: LogProvider = new LogProvider(NAME);
   private index: Trie = new Trie();
 
-  constructor() {
-    this.indexLog.info('Indexer Initialized');
-  }
+  constructor() {}
 
   async insertOne(word: string): Promise<boolean> {
     try {

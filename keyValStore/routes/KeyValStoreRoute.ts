@@ -13,6 +13,7 @@ import {
   KeyValStoreSeachTopicRequest
 } from '@core/models/store/KeyValStore';
 import { EventDrivenLogProvider } from '@core/providers/queue/EventDrivenLogProvider';
+import { SimpleQueueProvider } from '@core/providers/queue/SimpleQueueProvider';
 
 const NAME = 'Key Value Store Route';
 
@@ -20,8 +21,14 @@ export class KeyValStoreRoute extends BaseRoute {
   name = NAME;
   
   private log: LogProvider = new LogProvider(NAME);
+  private mutLock: boolean = false;
 
-  constructor(rootpath: string, private keyValStoreProv: KeyValStoreProvider, private eventLog: EventDrivenLogProvider) {
+  constructor(
+    rootpath: string, 
+    private keyValStoreProv: KeyValStoreProvider, 
+    private eventLog: EventDrivenLogProvider,
+    private keyValOpQueue: SimpleQueueProvider
+  ) {
     super(rootpath);
     this.log.initFileLogger();
 
@@ -32,6 +39,8 @@ export class KeyValStoreRoute extends BaseRoute {
     this.router.post(keyValStoreRouteMapping.store.subRouteMapping.flush.name, this.flush.bind(this));
     this.router.post(keyValStoreRouteMapping.store.subRouteMapping.searchKeys.name, this.searchKeys.bind(this));
     this.router.post(keyValStoreRouteMapping.store.subRouteMapping.searchTopics.name, this.searchTopics.bind(this));
+    
+    this.keyValQueueOn();
   }
 
   private async get(req: Request, res: Response, next: NextFunction) {
@@ -123,23 +132,34 @@ export class KeyValStoreRoute extends BaseRoute {
   }
 
   async performRouteAction(opts: RouteOpts, req: Request, res: Response, next: NextFunction, ...params) {
-    try {
-      const resp = await this.keyValStoreProv[opts.method](...params);
-      this.log.custom(opts.customMsg.customConsoleMessages[0], true);
+    this.keyValOpQueue.enqueue({ opts, res, params });
+  }
 
-      this.eventLog.addLog({
-        provider: 'Key Value Store Provider',
-        method: opts.method,
-        event: resp || null
-      });
+  private keyValQueueOn() {
+    this.keyValOpQueue.queueUpdate.on(this.keyValOpQueue.eventName, async () => {
+      if (this.keyValOpQueue.length > 0 && ! this.mutLock) {
+        const { opts, res, params } = this.keyValOpQueue.dequeue();
 
-      res
-        .status(200)
-        .send({ status: 'success', resp });
-    } catch (err) {
-      res
-        .status(404)
-        .send({ err: extractErrorMessage(err as Error) });
-    }
+        try {
+          const resp = await this.keyValStoreProv[opts.method](...params);
+          this.log.custom(opts.customMsg.customConsoleMessages[0], true);
+    
+          this.eventLog.addLog({
+            provider: 'Key Value Store Provider',
+            method: opts.method,
+            event: resp || null
+          });
+
+          res
+            .status(200)
+            .send({ status: 'success', resp });
+        } catch (err) {
+          this.log.error(`Error on ${NAME} => ${err as Error}`);
+          res
+            .status(404)
+            .send({ err: extractErrorMessage(err as Error) });
+        }
+      } 
+    });
   }
 }

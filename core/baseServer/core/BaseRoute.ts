@@ -11,7 +11,6 @@ export interface RouteOpts {
   customMsg: any;
 }
 
-
 export abstract class BaseRoute {
   protected name: string;
   protected router: Router;

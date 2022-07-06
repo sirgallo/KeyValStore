@@ -51,7 +51,7 @@ export class KeyValStoreProvider implements KeyValEndpoints {
           await this.store.topics[topic].index
             .insertMany(keysForTopic);
         } catch (err) {
-          this.keyValStoreLog.error(`Error inserting keys into index: ${extractErrorMessage(err as Error)}`)
+          this.keyValStoreLog.error(`Error inserting keys into index: ${extractErrorMessage(err as Error)}`);
           throw err;
         }
       }
@@ -64,17 +64,15 @@ export class KeyValStoreProvider implements KeyValEndpoints {
     return wrapAsync(this.multiValReducer.bind(this), opts.topic, opts.findKey, true) as Promise<KeyValStoreEntry<any>[]>;
   }
 
-  async current(opts: KeyValStoreTopicRequest): Promise<PartialKeyValStore<any, any>> {
+  async current(opts: KeyValStoreTopicRequest): Promise<KeyValStore<any, any>> {
     const curHelper = (topic?: string) => {
       return topic 
         ? { 
           store: { [topic]: this.store.store[topic] }, 
+          topics: this.store.topics[topic],
           version: this.store.version 
         } 
-        : { 
-          store: this.store.store, 
-          version: this.store.version 
-        };
+        : this.store;
     }
 
     return wrapAsync(curHelper, opts.topic) as Promise<KeyValStore<any, any>>;
