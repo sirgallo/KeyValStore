@@ -9,7 +9,8 @@ import { keyValStoreRouteMapping } from '@keyValStore/configs/KeyValStoreRouteMa
 import { 
   KeyValStoreEntryOpts,
   KeyValStoreGetRequest,
-  KeyValStoreTopicRequest
+  KeyValStoreTopicRequest,
+  KeyValStoreSeachTopicRequest
 } from '@core/models/store/KeyValStore';
 import { EventDrivenLogProvider } from '@core/providers/queue/EventDrivenLogProvider';
 
@@ -29,12 +30,17 @@ export class KeyValStoreRoute extends BaseRoute {
     this.router.post(keyValStoreRouteMapping.store.subRouteMapping.delete.name, this.delete.bind(this));
     this.router.post(keyValStoreRouteMapping.store.subRouteMapping.current.name, this.current.bind(this));
     this.router.post(keyValStoreRouteMapping.store.subRouteMapping.flush.name, this.flush.bind(this));
+    this.router.post(keyValStoreRouteMapping.store.subRouteMapping.searchKeys.name, this.searchKeys.bind(this));
+    this.router.post(keyValStoreRouteMapping.store.subRouteMapping.searchTopics.name, this.searchTopics.bind(this));
   }
 
   private async get(req: Request, res: Response, next: NextFunction) {
     const getReq: KeyValStoreGetRequest = req.body;
     await this.pipeRequest(
-      { method: keyValStoreRouteMapping.store.subRouteMapping.get.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.get }, 
+      { 
+        method: keyValStoreRouteMapping.store.subRouteMapping.get.key, 
+        customMsg: keyValStoreRouteMapping.store.subRouteMapping.get 
+      }, 
       req, res, next, 
       getReq
     );
@@ -43,7 +49,10 @@ export class KeyValStoreRoute extends BaseRoute {
   private async set(req: Request, res: Response, next: NextFunction) {
     const setReq: KeyValStoreEntryOpts = req.body;
     await this.pipeRequest(
-      { method: keyValStoreRouteMapping.store.subRouteMapping.set.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.set }, 
+      { 
+        method: keyValStoreRouteMapping.store.subRouteMapping.set.key, 
+        customMsg: keyValStoreRouteMapping.store.subRouteMapping.set 
+      }, 
       req, res, next, 
       setReq
     );
@@ -52,7 +61,10 @@ export class KeyValStoreRoute extends BaseRoute {
   private async delete(req: Request, res: Response, next: NextFunction) {
     const deleteReq: KeyValStoreGetRequest = req.body;
     await this.pipeRequest(
-      { method: keyValStoreRouteMapping.store.subRouteMapping.delete.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.delete }, 
+      { 
+        method: keyValStoreRouteMapping.store.subRouteMapping.delete.key, 
+        customMsg: keyValStoreRouteMapping.store.subRouteMapping.delete 
+      }, 
       req, res, next, 
       deleteReq
     );
@@ -61,7 +73,10 @@ export class KeyValStoreRoute extends BaseRoute {
   private async current(req: Request, res: Response, next: NextFunction) {
     const topicReq: KeyValStoreTopicRequest | null = req.body || null;
     await this.pipeRequest(
-      { method: keyValStoreRouteMapping.store.subRouteMapping.current.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.current }, 
+      { 
+        method: keyValStoreRouteMapping.store.subRouteMapping.current.key, 
+        customMsg: keyValStoreRouteMapping.store.subRouteMapping.current 
+      }, 
       req, res, next, 
       topicReq
     );
@@ -70,7 +85,34 @@ export class KeyValStoreRoute extends BaseRoute {
   private async flush(req: Request, res: Response, next: NextFunction) {
     const topicReq: KeyValStoreTopicRequest | null = req.body || null;
     await this.pipeRequest(
-      { method: keyValStoreRouteMapping.store.subRouteMapping.flush.key, customMsg: keyValStoreRouteMapping.store.subRouteMapping.flush }, 
+      { 
+        method: keyValStoreRouteMapping.store.subRouteMapping.flush.key, 
+        customMsg: keyValStoreRouteMapping.store.subRouteMapping.flush 
+      }, 
+      req, res, next, 
+      topicReq
+    );
+  }
+
+  private async searchKeys(req: Request, res: Response, next: NextFunction) {
+    const keyReq: KeyValStoreSeachTopicRequest | null = req.body;
+    await this.pipeRequest(
+      { 
+        method: keyValStoreRouteMapping.store.subRouteMapping.searchKeys.key, 
+        customMsg: keyValStoreRouteMapping.store.subRouteMapping.searchKeys 
+      }, 
+      req, res, next, 
+      keyReq
+    );
+  }
+
+  private async searchTopics(req: Request, res: Response, next: NextFunction) {
+    const topicReq: KeyValStoreSeachTopicRequest | null = req.body;
+    await this.pipeRequest(
+      { 
+        method: keyValStoreRouteMapping.store.subRouteMapping.searchTopics.key, 
+        customMsg: keyValStoreRouteMapping.store.subRouteMapping.searchTopics
+      }, 
       req, res, next, 
       topicReq
     );

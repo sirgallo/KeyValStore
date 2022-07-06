@@ -48,3 +48,15 @@ export const wrapAsync = async (func: Function, ...params) => {
 export const setIntervalQueue = (queue: SimpleQueueProvider, timeout: number = 200) => setInterval(() => queue.emitEvent(), timeout);
 
 export const extractErrorMessage = (err: Error): string => err.message;
+
+const HTTP_HEADERS = {
+  'Content-Type': 'application/json'
+}
+
+export const generatePostRequest = (opts: any) => {
+  return {
+    method: 'POST',
+    header: HTTP_HEADERS,
+    body: JSON.stringify(opts)
+  }
+}

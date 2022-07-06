@@ -105,6 +105,46 @@ export const keyValStoreRouteMapping: Record<string, IBaseRoute>= {
             }
           }
         ]
+      },
+      searchKeys: {
+        key: 'searchKeys',
+        name: '/searchkeys',
+        customConsoleMessages: [
+          {
+            1: { 
+              text: '/searchkeys', 
+              color: ROUTE 
+            },
+            2: { 
+              text: '200', 
+              color: STATUSOK 
+            },
+            3: { 
+              text: 'values retrieved successfully for given key search', 
+              color: INFO 
+            }
+          }
+        ]
+      },
+      searchTopics: {
+        key: 'searchTopics',
+        name: '/searchtopics',
+        customConsoleMessages: [
+          {
+            1: { 
+              text: '/searchtopics', 
+              color: ROUTE 
+            },
+            2: { 
+              text: '200', 
+              color: STATUSOK 
+            },
+            3: { 
+              text: 'values retrieved successfully for given topic search', 
+              color: INFO 
+            }
+          }
+        ]
       }
     }
   }

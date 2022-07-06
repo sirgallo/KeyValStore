@@ -26,21 +26,30 @@ export class EventDrivenLogRoute extends BaseRoute {
 
   private async countLogs(req: Request, res: Response, next: NextFunction) {
     await this.pipeRequest(
-      { method: eventDrivenLogRouteMapping.store.subRouteMapping.countLogs.key, customMsg: eventDrivenLogRouteMapping.store.subRouteMapping.countLogs }, 
+      { 
+        method: eventDrivenLogRouteMapping.store.subRouteMapping.countLogs.key, 
+        customMsg: eventDrivenLogRouteMapping.store.subRouteMapping.countLogs 
+      }, 
       req, res, next
     );
   }
 
   private async getAllLogs(req: Request, res: Response, next: NextFunction) {
     await this.pipeRequest(
-      { method: eventDrivenLogRouteMapping.store.subRouteMapping.getAllLogs.key, customMsg: eventDrivenLogRouteMapping.store.subRouteMapping.getAllLogs }, 
+      { 
+        method: eventDrivenLogRouteMapping.store.subRouteMapping.getAllLogs.key, 
+        customMsg: eventDrivenLogRouteMapping.store.subRouteMapping.getAllLogs 
+      }, 
       req, res, next
     );
   }
 
   private async getLatestLog(req: Request, res: Response, next: NextFunction) {
     await this.pipeRequest(
-      { method: eventDrivenLogRouteMapping.store.subRouteMapping.getLatestLog.key, customMsg: eventDrivenLogRouteMapping.store.subRouteMapping.getLatestLog }, 
+      { 
+        method: eventDrivenLogRouteMapping.store.subRouteMapping.getLatestLog.key, 
+        customMsg: eventDrivenLogRouteMapping.store.subRouteMapping.getLatestLog 
+      }, 
       req, res, next
     );
   }

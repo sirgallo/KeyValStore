@@ -1,24 +1,9 @@
 import { asyncExponentialBackoff } from '@core/utils/AsyncExponentialBackoff';
 import { 
-  KeyValStore,
-  KeyValEndpoints, 
-  KeyValStoreEntry, 
-  KeyValStoreEntryOpts, 
-  KeyValStoreGetRequest,
-  KeyValStoreTopicRequest
+  KeyValStore, KeyValStoreEntry, KeyValStoreEntryOpts,
+  KeyValStoreGetRequest, KeysSearchResponse, KeyValEndpoints,
+  KeyValStoreTopicRequest, KeyValStoreSeachTopicRequest, TopicsSearchResponse
 } from '@core/models/store/KeyValStore';
-
-const HTTP_HEADERS = {
-  'Content-Type': 'application/json'
-}
-
-const generatePostRequest = (opts: any) => {
-  return {
-    method: 'POST',
-    header: HTTP_HEADERS,
-    body: JSON.stringify(opts)
-  }
-}
 
 export class CLIProvider implements KeyValEndpoints { 
   private endpoints: Record<string, string>;
@@ -38,7 +23,7 @@ export class CLIProvider implements KeyValEndpoints {
     );
   }
 
-  async set(opts: KeyValStoreEntryOpts): Promise<KeyValStore> {
+  async set(opts: KeyValStoreEntryOpts): Promise<KeyValStoreEntry> {
     return await asyncExponentialBackoff(
       this.endpoints.set, 5, 500, { json: opts }
     );
@@ -62,8 +47,21 @@ export class CLIProvider implements KeyValEndpoints {
     );
   }
 
+  async searchKeys(opts: KeyValStoreSeachTopicRequest): Promise<KeysSearchResponse> {
+    return await asyncExponentialBackoff(
+      this.endpoints.searchKeys, 5, 500, { json: opts }
+    );
+  }
+
+  async searchTopics(opts: KeyValStoreSeachTopicRequest): Promise<TopicsSearchResponse> {
+    return await asyncExponentialBackoff(
+      this.endpoints.searchTopics, 5, 500, { json: opts }
+    );
+  }
+
   private parseUrl() {
     const port = `${ this.port ? ':' + this.port : this.port }`
+
     if (! this.https) {
       this.storehost = ! this.storehost.includes('http://') 
         ? `http://${this.storehost}${port}/store` 
@@ -81,7 +79,9 @@ export class CLIProvider implements KeyValEndpoints {
       set: `${this.storehost}/set`,
       delete: `${this.storehost}/delete`,
       current: `${this.storehost}/current`,
-      flush: `${this.storehost}/flush`
+      flush: `${this.storehost}/flush`,
+      searchKeys: `${this.storehost}/searchkeys`,
+      searchTopics: `${this.storehost}/searchtopics`
     }
   }
 }

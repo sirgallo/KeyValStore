@@ -1,3 +1,5 @@
+import { IndexProvider } from '@core/providers/store/IndexProvider';
+
 export type DeepPartialSchema<T> = {
   [ K in keyof T ]?: T[K] extends object
     ? DeepPartialSchema<T[K]>
@@ -14,12 +16,16 @@ export interface KeyValStoreEntryOpts {
 
 export interface KeyValStore { 
   store: Record<Topic, Record<Key, KeyValStoreEntry>>;
-  topics: Record<Topic, DeepPartialSchema<any>>;
+  topics: Record<Topic, IndexProvider>;
   version: number;
 };
 
 export interface KeyValStoreTopicRequest {
   topic: string;
+}
+
+export interface KeyValStoreSeachTopicRequest extends KeyValStoreTopicRequest {
+  search: string;
 }
 
 export interface KeyValStoreGetRequest extends KeyValStoreTopicRequest {
@@ -30,12 +36,21 @@ export interface KeyValStoreGetResponse {
   value: KeyValStoreEntry;
 }
 
-export type KeyValOperations = 'GET' | 'SET' | 'DELETE' | 'CURRENT' | 'FLUSH';
+export interface KeysSearchResponse {
+  keys: string[];
+  map: Record<Key, KeyValStoreEntry>
+}
+
+export interface TopicsSearchResponse {
+  topics: string[];
+}
 
 export interface KeyValEndpoints {
-  get(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry[]>
-  set(opts: KeyValStoreEntryOpts): Promise<KeyValStore>
-  delete(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry[]>
-  current(opts: KeyValStoreTopicRequest): Promise<KeyValStore>
-  flush(opts: KeyValStoreTopicRequest): Promise<boolean>
+  get(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry[]>;
+  set(opts: KeyValStoreEntryOpts): Promise<KeyValStoreEntry>;
+  delete(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry[]>;
+  current(opts: KeyValStoreTopicRequest): Promise<KeyValStore>;
+  flush(opts: KeyValStoreTopicRequest): Promise<boolean>;
+  searchKeys(opts: KeyValStoreSeachTopicRequest): Promise<KeysSearchResponse>
+  searchTopics(opts: KeyValStoreTopicRequest): Promise<TopicsSearchResponse>
 }

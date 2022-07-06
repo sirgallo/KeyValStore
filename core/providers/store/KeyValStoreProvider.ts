@@ -1,20 +1,21 @@
 import lodash from 'lodash';
-const { mergeWith, isArray } = lodash;
+const { mergeWith, isArray, pick } = lodash;
 
-import { memo, wrapAsync } from '@core/utils/Utils';
+import { extractErrorMessage, memo, wrapAsync } from '@core/utils/Utils';
 import { 
-  KeyValStore, 
-  KeyValStoreEntry, 
-  KeyValStoreEntryOpts,
-  KeyValStoreGetRequest,
-  KeyValEndpoints,
-  KeyValStoreTopicRequest
+  KeyValStore, KeyValStoreEntry, KeyValStoreEntryOpts,
+  KeyValStoreGetRequest, KeysSearchResponse, KeyValEndpoints,
+  KeyValStoreTopicRequest, KeyValStoreSeachTopicRequest, TopicsSearchResponse
 } from '@core/models/store/KeyValStore';
 import { LogProvider } from '@core/providers/LogProvider';
+import { IndexProvider } from './IndexProvider';
 
 const NAME = 'Key Value Store Provider';
 
 export class KeyValStoreProvider implements KeyValEndpoints {
+  private topicIndex: IndexProvider = new IndexProvider();
+  private topicSet: Set<string> = new Set();
+
   private store: KeyValStore = {
     store: {},
     topics: {},
@@ -29,18 +30,32 @@ export class KeyValStoreProvider implements KeyValEndpoints {
     return wrapAsync(this.multiValReducer.bind(this), opts.topic, opts.findKey) as Promise<KeyValStoreEntry[]>;
   }
 
-  async set(opts: KeyValStoreEntryOpts): Promise<KeyValStore> {
+  async set(opts: KeyValStoreEntryOpts): Promise<KeyValStoreEntry> {
     const customMerge = (obj: any, src: any) => { if (isArray(obj)) return obj.concat(src); }
-    const setHelper = (opts: KeyValStoreEntryOpts) => {
-      if (! memo(this.store.store, opts.entry)) {
-        this.store.store = mergeWith(this.store.store, opts.entry, customMerge);
-        this.store.version++;
-  
-        return opts.entry || null;
+    if (! memo(this.store.store, opts.entry)) {
+      this.store.store = mergeWith(this.store.store, opts.entry, customMerge);
+      this.store.version++;
+
+      for (const topic of Object.keys(opts.entry)) {
+        try {
+          if (! this.topicSet.has(topic)) { 
+            this.store.topics[topic] = new IndexProvider();
+            this.topicSet.add(topic);
+            await this.topicIndex.insertOne(topic);
+          }
+
+          const keysForTopic = Object.keys(opts.entry[topic]);
+          console.log(keysForTopic);
+
+          await this.store.topics[topic].insertMany(keysForTopic);
+        } catch (err) {
+          this.keyValStoreLog.error(`Error inserting keys into index: ${extractErrorMessage(err as Error)}`)
+          throw err;
+        }
       }
     }
-  
-    return wrapAsync(setHelper, opts) as Promise<KeyValStore>;
+
+    return opts.entry || null;
   }
 
   async delete(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry[]> {
@@ -66,6 +81,30 @@ export class KeyValStoreProvider implements KeyValEndpoints {
     await wrapAsync(flushHelper, opts.topic);
 
     return true;
+  }
+
+  async searchKeys(opts: KeyValStoreSeachTopicRequest): Promise<KeysSearchResponse> {
+    const resp: KeysSearchResponse = {
+      keys: null,
+      map: null
+    }
+
+    const keys = await this.store.topics[opts.topic].query(opts.search);
+
+    resp.keys = keys
+    resp.map = pick(this.store.store[opts.topic], keys);
+
+    return resp;
+  }
+
+  async searchTopics(opts: KeyValStoreTopicRequest): Promise<TopicsSearchResponse> {
+    const resp: TopicsSearchResponse = {
+      topics: null
+    }
+
+    resp.topics = await this.topicIndex.query(opts.topic);
+
+    return resp;
   }
 
   private validateSchemaType(incomingEntry: any): boolean {
