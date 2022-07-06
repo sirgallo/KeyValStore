@@ -1,11 +1,13 @@
 import lodash from 'lodash';
-const { mergeWith, isArray, pick } = lodash;
+const { mergeWith, isArray, pick, keysIn } = lodash;
 
-import { extractErrorMessage, memo, wrapAsync } from '@core/utils/Utils';
 import { 
-  KeyValStore, KeyValStoreEntry, KeyValStoreEntryOpts,
+  extractErrorMessage, memo, wrapAsync, generateObjectSchema
+} from '@core/utils/Utils';
+import { 
+  KeyValStore, KeyValStoreEntry, KeyValStoreEntryOpts, PartialKeyValStore,
   KeyValStoreGetRequest, KeysSearchResponse, KeyValEndpoints,
-  KeyValStoreTopicRequest, KeyValStoreSeachTopicRequest, TopicsSearchResponse
+  KeyValStoreTopicRequest, KeyValStoreSeachTopicRequest, TopicsSearchResponse,
 } from '@core/models/store/KeyValStore';
 import { LogProvider } from '@core/providers/LogProvider';
 import { IndexProvider } from './IndexProvider';
@@ -16,7 +18,7 @@ export class KeyValStoreProvider implements KeyValEndpoints {
   private topicIndex: IndexProvider = new IndexProvider();
   private topicSet: Set<string> = new Set();
 
-  private store: KeyValStore = {
+  private store: KeyValStore<any, any> = {
     store: {},
     topics: {},
     version: 0
@@ -26,28 +28,28 @@ export class KeyValStoreProvider implements KeyValEndpoints {
 
   constructor() {}
 
-  async get(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry[]> {
-    return wrapAsync(this.multiValReducer.bind(this), opts.topic, opts.findKey) as Promise<KeyValStoreEntry[]>;
+  async get(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry<any>[]> {
+    return wrapAsync(this.multiValReducer.bind(this), opts.topic, opts.findKey) as Promise<KeyValStoreEntry<any>[]>;
   }
 
-  async set(opts: KeyValStoreEntryOpts): Promise<KeyValStoreEntry> {
+  async set(opts: KeyValStoreEntryOpts): Promise<KeyValStoreEntry<any>> {
     const customMerge = (obj: any, src: any) => { if (isArray(obj)) return obj.concat(src); }
     if (! memo(this.store.store, opts.entry)) {
+      this.inheritType(opts);
       this.store.store = mergeWith(this.store.store, opts.entry, customMerge);
       this.store.version++;
 
       for (const topic of Object.keys(opts.entry)) {
         try {
           if (! this.topicSet.has(topic)) { 
-            this.store.topics[topic] = new IndexProvider();
+            this.store.topics[topic].index = new IndexProvider();
             this.topicSet.add(topic);
             await this.topicIndex.insertOne(topic);
           }
 
           const keysForTopic = Object.keys(opts.entry[topic]);
-          console.log(keysForTopic);
-
-          await this.store.topics[topic].insertMany(keysForTopic);
+          await this.store.topics[topic].index
+            .insertMany(keysForTopic);
         } catch (err) {
           this.keyValStoreLog.error(`Error inserting keys into index: ${extractErrorMessage(err as Error)}`)
           throw err;
@@ -58,22 +60,24 @@ export class KeyValStoreProvider implements KeyValEndpoints {
     return opts.entry || null;
   }
 
-  async delete(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry[]> {
-    return wrapAsync(this.multiValReducer.bind(this), opts.topic, opts.findKey, true) as Promise<KeyValStoreEntry[]>;
+  async delete(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry<any>[]> {
+    return wrapAsync(this.multiValReducer.bind(this), opts.topic, opts.findKey, true) as Promise<KeyValStoreEntry<any>[]>;
   }
 
-  async current(opts: KeyValStoreTopicRequest): Promise<KeyValStore> {
+  async current(opts: KeyValStoreTopicRequest): Promise<PartialKeyValStore<any, any>> {
     const curHelper = (topic?: string) => {
       return topic 
         ? { 
           store: { [topic]: this.store.store[topic] }, 
-          topic: this.store.topics[topic], 
           version: this.store.version 
         } 
-        : this.store;
+        : { 
+          store: this.store.store, 
+          version: this.store.version 
+        };
     }
 
-    return wrapAsync(curHelper, opts.topic) as Promise<KeyValStore>;
+    return wrapAsync(curHelper, opts.topic) as Promise<KeyValStore<any, any>>;
   }
 
   async flush(opts: KeyValStoreTopicRequest): Promise<boolean> {
@@ -89,7 +93,7 @@ export class KeyValStoreProvider implements KeyValEndpoints {
       map: null
     }
 
-    const keys = await this.store.topics[opts.topic].query(opts.search);
+    const keys = await this.store.topics[opts.topic].index.query(opts.search);
 
     resp.keys = keys
     resp.map = pick(this.store.store[opts.topic], keys);
@@ -107,12 +111,8 @@ export class KeyValStoreProvider implements KeyValEndpoints {
     return resp;
   }
 
-  private validateSchemaType(incomingEntry: any): boolean {
-    return false;
-  }
-
-  private multiValReducer(topic: string, keys: string[], del?: boolean): KeyValStoreEntry[] {
-    return keys.reduce( (acc: KeyValStoreEntry[], key: string) => { 
+  private multiValReducer(topic: string, keys: string[], del?: boolean): KeyValStoreEntry<any>[] {
+    return keys.reduce( (acc: KeyValStoreEntry<any>[], key: string) => { 
       if (this.store?.store?.[topic]?.[key]) {
         const val = this.store.store[topic][key];
         if (del) delete this.store.store[topic][key];
@@ -122,5 +122,17 @@ export class KeyValStoreProvider implements KeyValEndpoints {
 
       return acc;
     }, []);
+  }
+
+  private inheritType(insertObject: KeyValStoreEntryOpts) {
+    if (! memo(this.store.store, insertObject.entry)) {
+      keysIn(insertObject.entry)
+        .forEach( topic => {
+          if (! this.store.store[topic]) {
+            const DeepCloneType = generateObjectSchema(insertObject.entry[topic] as any);
+            this.store.topics[topic] = { ...this.store.topics[topic], schema: DeepCloneType }
+          }
+        });
+    }
   }
 }

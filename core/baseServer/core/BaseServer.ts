@@ -1,4 +1,7 @@
 import cluster from 'cluster';
+import { Worker } from 'worker_threads';
+import { EventEmitter } from 'events';
+import { AsyncResource } from 'async_hooks';
 import path from 'path';
 import * as url from 'url';
 
@@ -34,6 +37,21 @@ Base Server
       --> listen on default port
 */
 
+const TaskInfo = Symbol('TaskInfo');
+const WorkerFreedEvent = Symbol('WorkerFreedEvent');
+
+class WorkerPoolTaskInfo extends AsyncResource {
+  public callback;
+  constructor(callback) {
+    super('WorkerPoolTaskInfo');
+    this.callback = callback;
+  }
+
+  done(err, result) {
+    this.runInAsyncScope(this.callback, null, err, result);
+    this.emitDestroy();
+  }
+}
 
 export class BaseServer {
   name: string;
@@ -44,9 +62,13 @@ export class BaseServer {
 
   private log: LogProvider;
 
+  private workers = [];
+  private freeWorkers = [];
+  private poolEvents = new EventEmitter();
+
   private routes: any[] = [ new PollRoute(routeMappings.poll.name) ];
 
-  constructor(name: string, private port: number = 8000, private version: string = '0.1', numOfCpus?: number) {
+  constructor(name: string, private port: number = 8000, private version: string = '0.1', numOfCpus?: number, private multithreading?: { path: string }) {
     this.name = name;
 
     this.log = new LogProvider(this.name);
@@ -64,6 +86,12 @@ export class BaseServer {
   }
 
   async run() {
+    (! this.multithreading || this.numOfCpus === 1)
+      ? this.runCluster()
+      : this.runWorkers()
+  }
+
+  async runCluster() {
     try { 
       this.log.info(`Welcome to ${this.name}, version ${this.version}`);
       if (this.numOfCpus > 1) {
@@ -90,6 +118,51 @@ export class BaseServer {
       this.log.error(extractErrorMessage(err as Error));
       process.exit(1);
     }
+  }
+
+  async runWorkers() {
+    const workerHelperJs = path.join(__dirname, `WorkerHelper.cjs`);
+
+    const addWorker = () => {
+      const w = new Worker(workerHelperJs, {
+        workerData: {
+          tspath: path.join(__dirname, this.multithreading.path)
+        }  
+      });
+
+      w.on('message', res => {
+        w[TaskInfo].done(null, res);
+        w[TaskInfo] = null;
+
+        this.freeWorkers.push(w);
+        this.poolEvents.emit(WorkerFreedEvent);
+      });
+
+      w.on('error', err => {
+        if (w[TaskInfo]) w[TaskInfo].done(err, null);
+        else this.poolEvents.emit(WorkerFreedEvent);
+
+        this.workers.splice(this.workers.indexOf(w), 1);
+        addWorker();
+      });
+
+      this.workers.push(w);
+      this.freeWorkers.push(w);
+      this.poolEvents.emit(WorkerFreedEvent);
+    }
+
+    const runTask = (task, callback) => {
+      if (this.freeWorkers.length === 0) {
+        this.poolEvents.once(WorkerFreedEvent, () => runTask(task, callback));
+        return;
+      }
+  
+      const worker = this.freeWorkers.pop();
+      worker[TaskInfo] = new WorkerPoolTaskInfo(callback);
+      worker.postMessage(task);
+    }
+    
+    const close = () => this.workers.forEach( w => w.terminate());
   }
 
   private initApp() {

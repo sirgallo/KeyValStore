@@ -6,19 +6,26 @@ export type DeepPartialSchema<T> = {
     : T[K]
 };
 
-export type KeyValStoreEntry = DeepPartialSchema<any>;
 export type Topic = string;
 export type Key = string;
 
-export interface KeyValStoreEntryOpts {
-  entry: Record<Topic, Record<Key, KeyValStoreEntry>>;
+export type KeyValStoreEntry<T> = DeepPartialSchema<T>;
+
+export type TopicsStore<T> = {
+  [ K in keyof T ]: { schema: DeepPartialSchema<T[K]>, index: IndexProvider }
 }
 
-export interface KeyValStore { 
-  store: Record<Topic, Record<Key, KeyValStoreEntry>>;
-  topics: Record<Topic, IndexProvider>;
+export type PartialKeyValStore<T, U> = Pick<KeyValStore<T, U>, 'store' | 'version'>;
+
+export interface KeyValStoreEntryOpts {
+  entry: Record<Topic, Record<Key, KeyValStoreEntry<any>>>;
+}
+
+export type KeyValStore<T, U> = { 
+  store: Record<Topic, Record<Key, KeyValStoreEntry<U>>>;
+  topics: TopicsStore<T>;
   version: number;
-};
+}
 
 export interface KeyValStoreTopicRequest {
   topic: string;
@@ -33,12 +40,12 @@ export interface KeyValStoreGetRequest extends KeyValStoreTopicRequest {
 }
 
 export interface KeyValStoreGetResponse {
-  value: KeyValStoreEntry;
+  value: KeyValStoreEntry<any>;
 }
 
 export interface KeysSearchResponse {
   keys: string[];
-  map: Record<Key, KeyValStoreEntry>
+  map: Record<Key, KeyValStoreEntry<any>>;
 }
 
 export interface TopicsSearchResponse {
@@ -46,10 +53,10 @@ export interface TopicsSearchResponse {
 }
 
 export interface KeyValEndpoints {
-  get(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry[]>;
-  set(opts: KeyValStoreEntryOpts): Promise<KeyValStoreEntry>;
-  delete(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry[]>;
-  current(opts: KeyValStoreTopicRequest): Promise<KeyValStore>;
+  get(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry<any>[]>;
+  set(opts: KeyValStoreEntryOpts): Promise<KeyValStoreEntry<any>>;
+  delete(opts: KeyValStoreGetRequest): Promise<KeyValStoreEntry<any>[]>;
+  current(opts: KeyValStoreTopicRequest): Promise<PartialKeyValStore<any, any>>;
   flush(opts: KeyValStoreTopicRequest): Promise<boolean>;
   searchKeys(opts: KeyValStoreSeachTopicRequest): Promise<KeysSearchResponse>
   searchTopics(opts: KeyValStoreTopicRequest): Promise<TopicsSearchResponse>

@@ -1,6 +1,6 @@
 import { asyncExponentialBackoff } from '@core/utils/AsyncExponentialBackoff';
 import { 
-  KeyValStore, KeyValStoreEntry, KeyValStoreEntryOpts,
+  KeyValStoreEntry, KeyValStoreEntryOpts, PartialKeyValStore,
   KeyValStoreGetRequest, KeysSearchResponse, KeyValEndpoints,
   KeyValStoreTopicRequest, KeyValStoreSeachTopicRequest, TopicsSearchResponse
 } from '@core/models/store/KeyValStore';
@@ -35,7 +35,7 @@ export class CLIProvider implements KeyValEndpoints {
     );
   }
 
-  async current(opts: KeyValStoreTopicRequest): Promise<KeyValStore> {
+  async current(opts: KeyValStoreTopicRequest): Promise<PartialKeyValStore> {
     return await asyncExponentialBackoff(
       this.endpoints.current, 5, 500, { json: opts }
     );

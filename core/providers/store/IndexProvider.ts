@@ -36,7 +36,6 @@ export class IndexProvider implements IndexMethods {
 
   async insertMany(words: string[]) {
     try {
-      console.log(words);
       return await this.index.bulkInsert(words);
     } catch (err) { 
       this.indexLog.error(`Error inserting values into index: => ${extractErrorMessage(err as Error)}`);

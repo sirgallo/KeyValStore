@@ -1,6 +1,6 @@
 import { freemem } from 'os';
 import lodash from 'lodash';
-const { isEqual } = lodash;
+const { isEqual, cloneDeepWith } = lodash;
 
 import { SimpleQueueProvider } from '@core/providers/queue/SimpleQueueProvider';
 
@@ -59,4 +59,23 @@ export const generatePostRequest = (opts: any) => {
     header: HTTP_HEADERS,
     body: JSON.stringify(opts)
   }
+}
+
+const schemaPrimitives = [
+  'string',
+  'number',
+  'bigint',
+  'boolean',
+  'undefined',
+  'null',
+  'symbol'
+];
+
+export const generateObjectSchema = (object: any) => {
+  const customizer = (element) => {
+    const elemType = typeof element;
+    if (schemaPrimitives.includes(elemType)) return elemType;
+  }
+
+  return cloneDeepWith(object, customizer);
 }
