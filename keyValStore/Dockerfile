@@ -8,11 +8,11 @@ WORKDIR /usr/src/keyval
 COPY core ./core
 COPY keyValStore ./keyValStore
 
-COPY modAlias.ts \
+COPY moduleAlias.mjs \
     ServerConfigurations.ts \ 
     package.json \
     package-lock.json \
-    gruntfile.js \
+    gruntfile.cjs \
     tsconfig.json ./
 
 RUN npm install

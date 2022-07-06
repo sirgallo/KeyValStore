@@ -1,4 +1,5 @@
-import { mergeWith, isArray } from 'lodash';
+import lodash from 'lodash';
+const { mergeWith, isArray } = lodash;
 
 import { memo, wrapAsync } from '@core/utils/Utils';
 import { 

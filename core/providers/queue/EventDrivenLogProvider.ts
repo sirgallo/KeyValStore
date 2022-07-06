@@ -1,12 +1,11 @@
 import { SimpleQueueProvider } from '@core/providers/queue/SimpleQueueProvider';
-import { setIntervalQueue } from '@core/utils/Utils';
 
 const EVENT_NAME = 'Event Log';
 
 interface EventDrivenLogEntry {
   provider: string;
   method: string;
-  event?: string;
+  event?: any;
 }
 
 export class EventDrivenLogProvider {

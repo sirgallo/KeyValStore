@@ -1,5 +1,6 @@
 import cluster from 'cluster';
 import path from 'path';
+import * as url from 'url';
 
 import express from 'express';
 
@@ -15,8 +16,11 @@ import helmet from 'helmet';
 import { LogProvider } from '@core/providers/LogProvider';
 import { PollRoute } from '@core/baseServer/routes/PollRoute';
 import { routeMappings } from '@core/baseServer/configs/RouteMappings';
+import { extractErrorMessage } from '@core/utils/Utils';
 
 config({ path: '.env' });
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 /*
 Base Server
@@ -64,59 +68,74 @@ export class BaseServer {
       this.log.info(`Welcome to ${this.name}, version ${this.version}`);
       if (this.numOfCpus > 1) {
         if (cluster.isPrimary) {
-          this.log.info(`Welcome to ${this.name}, version ${this.version}, forking workers...`);
+          this.log.info('...forking workers');
 
-          this.ip = BaseServer.setIp(this.log);
-          this.app = express();
+          this.initApp();
           this.setUpWorkers();
         } else if (cluster.isWorker) {
-          this.app = express();
           this.initApp();
+          this.initMiddleware();
           this.initRoutes();
           this.setUpServer();
         }
       } else if (this.numOfCpus === 1) {
-        this.app = express();
         this.initApp();
+        this.initMiddleware();
         this.initRoutes();
         this.setUpServer();
       } else {
         throw new Error('Number of cpus must be greater than 1.');
       }
     } catch (err) {
-      this.log.error(JSON.stringify({ err }, null, 2));
+      this.log.error(extractErrorMessage(err as Error));
       process.exit(1);
     }
   }
 
   private initApp() {
-    this.ip = BaseServer.setIp(this.log);
-    this.app.set('port', this.port);
+    try {
+      this.app = express();
+    } catch (err) {
+      throw Error(`error initializing app => ${extractErrorMessage(err as Error)}`);
+    }
+  }
 
-    this.app.use(e.json());
-    this.app.use(e.urlencoded({ extended: false }));
-    this.app.use(cookieParser());
-    this.app.use(e.static(path.join(__dirname, 'public')));
-    this.app.use(compression());
-    this.app.use(helmet());
+  private initMiddleware() {
+    try {
+      this.ip = BaseServer.setIp(this.log);
+      this.app.set('port', this.port);
+
+      this.app.use(e.json());
+      this.app.use(e.urlencoded({ extended: false }));
+      this.app.use(cookieParser());
+      this.app.use(e.static(path.join(__dirname, 'public')));
+      this.app.use(compression());
+      this.app.use(helmet());
+    } catch (err) {
+      throw Error(`error initializing middleware => ${extractErrorMessage(err as Error)}`);
+    }
   }
 
   private initRoutes() {
-    for (const route of this.routes) {
-      this.app.use(route.rootpath, route.router);
-      this.log.info(`Route: ${route.name} initialized on Worker ${process.pid}.`);
+    try {
+      for (const route of this.routes) {
+        this.app.use(route.rootpath, route.router);
+        this.log.info(`Route: ${route.name} initialized on Worker ${process.pid}.`);
+      }
+
+      this.app.use( (req, res, next) => {
+        next(createError(404));
+      });
+
+      this.app.use( (err, req, res, next) => {
+        res.locals.message = err.message;
+        res.locals.error = req.this.app.get('env') === 'development' ? err : {};
+        
+        res.status(err.status || 500).json({ error: err.message });
+      });
+    } catch (err) {
+      throw Error(`error initializing routes => ${extractErrorMessage(err as Error)}`);
     }
-
-    this.app.use( (req, res, next) => {
-      next(createError(404));
-    });
-
-    this.app.use( (err, req, res, next) => {
-      res.locals.message = err.message;
-      res.locals.error = req.this.app.get('env') === 'development' ? err : {};
-      
-      res.status(err.status || 500).json({ error: err.message });
-    });
   }
 
   private setUpServer() {

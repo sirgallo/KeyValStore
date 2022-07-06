@@ -40,6 +40,7 @@ export class FileOpProvider {
         ...this.opts?.encoding,
         ...this.opts?.flag
       });
+
       const jsonResult = JSON.parse(res.toString());
       this.log.success(`File successfully read to json object, returning result.`);
 
@@ -50,6 +51,7 @@ export class FileOpProvider {
   async writeLogFile(payload: any, pathForFile?: string, passive?: boolean): Promise<string> {
     const filename = `${randomUUID({ disableEntropyCache: true })}.log`;
     const fullPath =  pathForFile ? pathForFile : path.normalize(path.join(process.cwd(), filename));
+    
     try {
       if (! passive) this.log.info(`Attempting to write json payload to this path: ${fullPath}`);
       if (! this.exists(fullPath)) await asyncWriteFile(fullPath, `${payload}\n`, this.opts);

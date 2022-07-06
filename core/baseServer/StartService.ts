@@ -1,5 +1,3 @@
-require('module-alias/register');
-
 import { InitBaseServer } from '@core/baseServer/core/InitBaseServer';
 
 import { serverConfiguration } from '@core/baseServer/ServerConfiguration';

@@ -88,7 +88,7 @@ export class KeyValStoreRoute extends BaseRoute {
       this.eventLog.addLog({
         provider: 'Key Value Store Provider',
         method: opts.method,
-        event: JSON.stringify(resp) || null
+        event: resp || null
       });
 
       res

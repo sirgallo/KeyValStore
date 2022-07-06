@@ -1,5 +1,6 @@
 import { freemem } from 'os';
-import { isEqual } from 'lodash';
+import lodash from 'lodash';
+const { isEqual } = lodash;
 
 import { SimpleQueueProvider } from '@core/providers/queue/SimpleQueueProvider';
 

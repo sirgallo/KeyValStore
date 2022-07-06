@@ -5,16 +5,18 @@
     "sourceMap": false,
     "declaration": false,
     "moduleResolution": "node",
-    "module": "commonjs",
+    "module": "es2022",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "esModuleInterop": true,
-    "target": "ES2021",
+    "target": "es2022",
+    "allowJs": true,
+    "resolveJsonModule": true,
     "typeRoots": [
       "node_modules/@types"
     ],
     "lib": [
-      "ES2021",
+      "es2022",
       "dom"
     ],
     "baseUrl": "./",
@@ -22,7 +24,8 @@
       "@core/*": ["core/*"],
       "@cli/*": ["cli/*"],
       "@baseServer/*": ["core/baseServer/*"],
-      "@keyValStore/*": ["keyValStore/*"]
+      "@keyValStore/*": ["keyValStore/*"],
+      "@tests/*": ["tests/*"]
     }
   }
 }

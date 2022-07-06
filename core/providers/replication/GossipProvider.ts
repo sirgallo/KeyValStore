@@ -32,7 +32,7 @@ export class GossipProtocolProvider {
     this.client.routingId = this.systemUUID;
     this.replicate.routingId = this.systemUUID;
     this.intializeBucket();
-    this.initializeRandomPeers();
+    //  this.initializeRandomPeers();
   }
 
   async runSocket() {
@@ -40,9 +40,11 @@ export class GossipProtocolProvider {
   }
 
   intializeBucket() {
+    /*
     this.bucket = {
       [this.systemUUID]: this.eventLog.getInternalQueueRef()
     }
+    */
   }
 
   initializeRandomPeers() {

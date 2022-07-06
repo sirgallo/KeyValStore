@@ -1,19 +1,24 @@
 import { EventEmitter } from 'events';
-import { randomBytes } from 'crypto';
+import { randomBytes, createHash } from 'crypto';
 
 import { LogProvider } from '@core/providers/LogProvider';
 import { ILinkedNode, HashString } from '@core/models/infrastructure/IMq';
+import { 
+  LinkedNodeData, 
+  SimpleQueue, 
+  SimpleQueueMethods 
+} from '@core/models/queue/Queue';
 
 const NAME = 'Simple Queue Provider';
 const HASHLENGTH = 48;
 const HASHENCODING = 'hex';
 
-export class SimpleQueueProvider {
+export class SimpleQueueProvider implements SimpleQueueMethods {
   eventName: string;
   queueUpdate = new EventEmitter();
   length: number = 0;
 
-  private elements: Record<HashString, ILinkedNode> = {};
+  private elements: SimpleQueue = {};
   private headNode: ILinkedNode;
   private tailNode: ILinkedNode;
 
@@ -28,7 +33,7 @@ export class SimpleQueueProvider {
     try {
       const timestamp = new Date();
 
-      const hashRef = `${randomBytes(HASHLENGTH)
+      const hashRef: HashString = `${randomBytes(HASHLENGTH)
         .toString(HASHENCODING)}-${timestamp.toISOString()}`;
       
       if (! this.headNode) {
@@ -79,7 +84,7 @@ export class SimpleQueueProvider {
     }
   }
 
-  peek() {
+  peek(): LinkedNodeData {
     try {
       return { value: this.tailNode?.value, timestamp: this.tailNode?.timestamp } || null;
     } catch (err) {
@@ -88,7 +93,7 @@ export class SimpleQueueProvider {
     }
   }
 
-  all() {
+  all(): SimpleQueue {
     try {
       return this.elements || null;
     } catch(err) {

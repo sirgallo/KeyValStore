@@ -1,5 +1,3 @@
-import '../modAlias';
-
 import { InitKeyValStoreService } from '@keyValStore/InitKeyValStoreService';
 import { serverConfiguration } from '../ServerConfigurations';
 

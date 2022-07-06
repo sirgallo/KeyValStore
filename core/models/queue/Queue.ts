@@ -1,10 +1,11 @@
-export interface SimpleQueue {
-  enqueue(insertValue: any): void;
-  dequeue()
-}
+import { ILinkedNode, HashString } from '@core/models/infrastructure/IMq';
 
-export interface SimpleStack {
-  push();
-  pop();
-  peek();
+export type SimpleQueue = Record<HashString, ILinkedNode>;
+export type LinkedNodeData = Pick<ILinkedNode, 'value' | 'timestamp'>
+
+export interface SimpleQueueMethods {
+  enqueue(insertValue: any): void;
+  dequeue(): any;
+  peek(): LinkedNodeData;
+  all(): SimpleQueue; 
 }
