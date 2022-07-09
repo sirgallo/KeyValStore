@@ -5,7 +5,9 @@ import { LogProvider } from '../LogProvider';
 
 export class MongooseProvider {
   conn: Connection;
+
   private log = new LogProvider('Mongoose Provider');
+
   constructor(private creds: IMongoCredentials, private db: string) {}
 
   async initDefault() {
@@ -29,11 +31,11 @@ export class MongooseProvider {
     conn.on('error', err => {
       this.log.error(err);
       throw err;
-    })
+    });
   }
 
   private getNormalizeHost(): string {
-    return `mongodb://${this.creds.user}:${this.creds.password}@${this.creds.host}:${this.creds.port}/${this.db}`
+    return `mongodb://${this.creds.user}:${this.creds.password}@${this.creds.host}:${this.creds.port}/${this.db}`;
   }
 
   private normalizeConnOptions() {
@@ -45,6 +47,6 @@ export class MongooseProvider {
   }
 
   addModel<T>(conn: Connection, db: string, mongoSchema: Schema) { 
-    return conn.model<T>(db, mongoSchema)
+    return conn.model<T>(db, mongoSchema);
   }
 }

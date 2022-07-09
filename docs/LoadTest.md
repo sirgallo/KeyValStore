@@ -8,4 +8,4 @@ using `loadtest`
 
 loadtest -n 200 -c 10 -k -P '{}' -T 'application/json' http://localhost:8888/store/current/
 
-loadtest -n 100000 -c 10 -k --data '{"topic": "hello", "findKey": [ "outerindex" ]}' -T 'application/json' -m POST http://localhost:8888/store/get/
+loadtest -n 10000 -c 10 -k --data '{"topic": "hello", "findKey": [ "outerindex" ]}' -T 'application/json' -m POST http://localhost:8888/store/get/

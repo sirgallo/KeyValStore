@@ -1,5 +1,4 @@
 import { LogProvider } from '@core/providers/LogProvider';
-
 import { CLIProvider } from '@cli/providers/CLIProvider';
 
 const NAME = 'Key Val Store CLI';
@@ -28,7 +27,9 @@ if (args.length !== 7) throw new Error('Incorrect arguments provided');
 
 const cli = new CLIProvider(args[args.length - 4], parseInt(args[args.length - 3]));
 
-new CLI(cli)
-  .run()
-  .then( resp => console.log(resp))
-  .catch( err => console.log(err));
+try {
+  const c = new CLI(cli);
+  await c.run();
+} catch (err) {
+  console.log(err);
+}

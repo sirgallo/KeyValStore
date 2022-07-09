@@ -51,7 +51,7 @@
 
 `Flush - Single Topic`
 ```bash
-  npm run cli localhost 6789 flush '{"topic": "<topic>"}'
+  npm run cli <host> <port> flush '{"topic": "<topic>"}'
 ```
 
 
@@ -59,12 +59,12 @@
 
 `SearchKeys - Single Topic`
 ```bash
-  npm run cli localhost 6789 searchKeys '{"topic": "<topic>", "search": "<partialWord>" }'
+  npm run cli <host> <port> searchKeys '{"topic": "<topic>", "search": "<partialWord>" }'
 ```
 
 `SearchTopics`
 ```bash
-  npm run cli localhost 6789 searchTopics '{"topic": "<partialWord>"}'
+  npm run cli <host> <port> searchTopics '{"topic": "<partialWord>"}'
 ```
 
 

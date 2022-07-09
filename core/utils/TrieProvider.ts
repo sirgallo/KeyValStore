@@ -48,8 +48,11 @@ export class Trie extends TrieNode {
       const recursiveInsert = (node: TrieNode, str: string) => {
         if (! node.getChild(str[0])) node.setChild(str[0]);
         
-        if (str.length > 1 ) recursiveInsert(node.getChild(str[0]), str.slice(1));
-        else if (str.length === 1) node.getChild(str[0]).setEnd(true);
+        str.length > 1 
+          ? recursiveInsert(node.getChild(str[0]), str.slice(1))
+          : str.length === 1
+          ? node.getChild(str[0]).setEnd(true)
+          : {};
       }
 
       recursiveInsert(this, str);
@@ -63,8 +66,9 @@ export class Trie extends TrieNode {
 
     const searchHelper = (word: string) => {
       const remainingTreeHelper = (node: TrieNode, partialWord: string) => {
-        if (partialWord) return remainingTreeHelper(node.getChild(word[0]), partialWord.substring(1));
-        else return node;
+        return partialWord 
+          ? remainingTreeHelper(node.getChild(word[0]), partialWord.substring(1))
+          : node;
       }
 
       const allWordsHelper = (wordSoFar: string, tree: TrieNode) => {
@@ -79,8 +83,9 @@ export class Trie extends TrieNode {
 
       const remainingTree = remainingTreeHelper(this, word);
 
-      if (remainingTree) allWordsHelper(word, remainingTree);
-      else allWordsHelper(word, this);
+      remainingTree 
+        ? allWordsHelper(word, remainingTree)
+        : allWordsHelper(word, this);
 
       return words;
     }
